@@ -3,6 +3,7 @@
 
 ## Official documentation from Netatmo
 
+https://dev.netatmo.com/apidocumentation/oauth
 https://dev.netatmo.com/apidocumentation/energy
 
 
