@@ -6,8 +6,11 @@ import os
 import configparser
 import logging
 
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(format='%(levelname)-8s [%(filename)s:%(lineno)d] - %(message)s',
+    datefmt='%Y-%m-%d:%H:%M:%S',
+    level=logging.INFO)
 logger = logging.getLogger(__name__)
+logger.propagate = False
 
 class Netatmo_API():
 
