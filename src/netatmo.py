@@ -60,6 +60,10 @@ class MyNetatmo():
     def get_settings_file(self, settings_file: str = None):
         if settings_file == None:
             settings_file = self.settings_file
+        
+        if not os.path.exists(settings_file):
+            raise Exception(f"Missing settings file! {settings_file}")
+            sys.exit(-1)
         config = configparser.ConfigParser()
         config.read(settings_file)
 
@@ -120,25 +124,49 @@ class MyNetatmo():
         response = netatmo.setthermmode(mode=mode)
         return response
 
-def get_flags():
-    # parser = argparse.ArgumentParser()
-    # parser.add_argument()("-c", "--configfile", help="init config file", required=False)
-    # parser.add_argument()("-d", "--daemon", help="daemon", required=False)
+def launch_daemon():
+    logger.info("Launched daemon")
+    netatmo_run = MyNetatmo()
+    netatmo_run.get_netatmo_status()
+    netatmo_run.schedule_daemon()
+    while netatmo_run.scheduler_status():
+        time.sleep(10)
 
-    # settings = parser.parse_args()
-    settings = None
+def get_flags():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-c", "--configfile", type=str, help="init config file")
+    parser.add_argument("-d", "--daemon", help="daemon", action="store_true")
+
+    settings = parser.parse_args()
     return settings
        
 
 def main():
     flags = get_flags()
 
+    positional_args = flags._get_args()
+    kw_args = flags._get_kwargs()
+
+    if flags.configfile:
+        settings_file = flags.configfile
+        logger.info(f"Using alternate config file {settings_file}")
+    else:
+        settings_file = None
+
+    if flags.daemon:
+        logger.info("Launching daemon")
+        netatmo_run = MyNetatmo(settings_file=settings_file)
+        netatmo_run.get_netatmo_status()
+        netatmo_run.schedule_daemon()
+        while netatmo_run.scheduler_status():
+            time.sleep(10)
+
     if len(sys.argv) > 0:
         parameter = sys.argv[1]
     else:
         parameter = "schedule"
 
-    netatmo_run = MyNetatmo()
+    netatmo_run = MyNetatmo(settings_file=settings_file)
     netatmo_run.get_netatmo_status()
     netatmo_run.schedule_daemon()
     while netatmo_run.scheduler_status():
