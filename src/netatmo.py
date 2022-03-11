@@ -42,6 +42,10 @@ def main():
         config["credentials"]["scopes"] = "read_station read_thermostat write_thermostat read_camera write_camera access_camera read_presence access_presence read_smokedetector read_homecoach"
         config["home"] = {}
         config["home"]["home_id"] = "your_home_id"
+        config["mqtt"] = {}
+        config["mqtt"]["topic"] = "netatmo/metrics"
+        config["mqtt"]["broker"] = "127.0.0.1"
+        config["mqtt"]["port"] = "1883"
         with open(settings_file, "w") as config_file:
             config.write(config_file)
         return
@@ -57,6 +61,12 @@ def main():
 
     # Settings home section
     home_id = config["home"]["home_id"]
+
+    # Settings mqtt
+    topic =  config["mqtt"]["topic"]
+    broker = config["mqtt"]["broker"]
+    port  = int(config["mqtt"]["port"])
+
     netatmo = Netatmo_API(client_id, client_secret,
                           username, password, scopes=scopes)
     if len(sys.argv) > 0:
