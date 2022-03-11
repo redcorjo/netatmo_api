@@ -136,6 +136,7 @@ def launch_daemon():
 def get_flags():
     parser = argparse.ArgumentParser()
     parser.add_argument("-c", "--configfile", type=str, help="init config file")
+    parser.add_argument("--setthermmode", type=str, help="setthermmode away or schedule")
     parser.add_argument("-d", "--daemon", help="daemon", action="store_true")
 
     settings = parser.parse_args()
@@ -153,6 +154,12 @@ def main():
         logger.info(f"Using alternate config file {settings_file}")
     else:
         settings_file = None
+
+    # if flags.setthermmode:
+    #     setthermmode_value = flags.setthermmode
+    #     logger.info(f"Using alternate config file {settings_file}")
+    # else:
+    #     settings_file = None
 
     if flags.daemon:
         logger.info("Launching daemon")
