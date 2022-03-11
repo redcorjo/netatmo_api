@@ -6,7 +6,7 @@ import os
 import configparser
 import logging
 import time
-from optparse import OptionParser
+import argparse
 from apscheduler.schedulers.background import BackgroundScheduler
 from netatmo_api import Netatmo_API
 from mqtt import MQTT
@@ -121,13 +121,12 @@ class MyNetatmo():
         return response
 
 def get_flags():
-    parser = OptionParser()
-    parser.add_option("-f", "--configfile", dest="filename",
-                      help="init config file", metavar="FILE")
-    parser.add_option("-s", "--sechedule", dest="filename",
-                      help="schedule", metavar="FILE")
+    # parser = argparse.ArgumentParser()
+    # parser.add_argument()("-c", "--configfile", help="init config file", required=False)
+    # parser.add_argument()("-d", "--daemon", help="daemon", required=False)
 
-    settings = parser.parse_args()
+    # settings = parser.parse_args()
+    settings = None
     return settings
        
 
