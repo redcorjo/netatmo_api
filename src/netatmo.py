@@ -91,6 +91,7 @@ class MyNetatmo():
     def schedule_daemon(self):
         if self.scheduler == None:
             self.scheduler = BackgroundScheduler()
+        logger.info(f"Schedule daemon with frequency={self.frequency}")
         self.scheduler.add_job(self.get_netatmo_status, "interval", minutes=self.frequency)
         self.scheduler.start()
 
