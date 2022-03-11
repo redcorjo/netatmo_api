@@ -6,7 +6,8 @@ import os
 import configparser
 import logging
 from optparse import OptionParser
-from netatmo_api.netatmo_api import Netatmo_API
+from netatmo_api import Netatmo_API
+from mqtt import MQTT
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -43,7 +44,7 @@ def main():
         config["home"] = {}
         config["home"]["home_id"] = "your_home_id"
         config["mqtt"] = {}
-        config["mqtt"]["topic"] = "netatmo/metrics"
+        config["mqtt"]["topic"] = "netatmo2mqtt/status"
         config["mqtt"]["broker"] = "127.0.0.1"
         config["mqtt"]["port"] = "1883"
         with open(settings_file, "w") as config_file:
@@ -66,6 +67,11 @@ def main():
     topic =  config["mqtt"]["topic"]
     broker = config["mqtt"]["broker"]
     port  = int(config["mqtt"]["port"])
+    mqtt_settings = {
+        "topic": topic,
+        "broker": broker,
+        "port": port
+    }
 
     netatmo = Netatmo_API(client_id, client_secret,
                           username, password, scopes=scopes)
@@ -73,9 +79,28 @@ def main():
         parameter = sys.argv[1]
     else:
         parameter = "schedule"
-    response1 = netatmo.homesdata()
-    response2 = netatmo.homestatus()
+
+
+    mqtt = MQTT(**mqtt_settings )
+    homesdata_response = netatmo.homesdata()
+    #homestatus_response = netatmo.homestatus()
     response3 = netatmo.setthermmode(mode=parameter)
+
+    for homedata in homesdata_response["body"]["homes"]:
+        my_home_id = homedata["id"]
+        mqtt.send_message(payload=homedata, item=my_home_id)
+        homestatus_response = netatmo.homestatus(home_id=home_id)
+        for room in homestatus_response["body"]["home"]["rooms"]:
+            item = room["id"]
+            mqtt.send_message(payload=room, item=item)
+            pass
+        for module in homestatus_response["body"]["home"]["modules"]:
+            item = module["id"]
+            mqtt.send_message(payload=module, item=item)
+            pass
+        
+
+
     return None
 
 
