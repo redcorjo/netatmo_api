@@ -41,6 +41,21 @@ class MQTT():
         self.client.publish(topic, message)
         pass
 
+    def process_mqtt(self, client, userdata, message):
+        logger.info(f"message received {message.payload}")
+        logger.info("message topic=",message.topic)
+        logger.info("message qos=",message.qos)
+        logger.info("message retain flag=",message.retain)
+
+    def subscribe_topic(self, topic=None, qos=0):
+        if self.client == None:
+            self.__connect_queue()
+        if topic == None:
+            topic = f"{self.topic}/+/update" 
+        self.client.subscribe(topic, qos=0)
+        self.client.on_message=self.process_mqtt
+        self.client.loop_forever()
+
     def __connect_queue(self):
         client = paho.Client("mqtt_netatmo")
         client.connect(self.broker, self.port)
