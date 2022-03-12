@@ -7,6 +7,7 @@ import configparser
 import logging
 import time
 import argparse
+from enum import Enum
 from apscheduler.schedulers.background import BackgroundScheduler
 from netatmo_api import Netatmo_API
 from mqtt import MQTT
@@ -133,10 +134,11 @@ def launch_daemon():
     while netatmo_run.scheduler_status():
         time.sleep(10)
 
+
 def get_flags():
     parser = argparse.ArgumentParser()
     parser.add_argument("-c", "--configfile", type=str, help="init config file")
-    parser.add_argument("--setthermmode", type=str, help="setthermmode away or schedule")
+    parser.add_argument("-st", "--setthermmode", type=str, help="setthermmode away or schedule possible values")
     parser.add_argument("-d", "--daemon", help="daemon", action="store_true")
 
     settings = parser.parse_args()
@@ -155,11 +157,15 @@ def main():
     else:
         settings_file = None
 
-    # if flags.setthermmode:
-    #     setthermmode_value = flags.setthermmode
-    #     logger.info(f"Using alternate config file {settings_file}")
-    # else:
-    #     settings_file = None
+    if flags.setthermmode:
+        setthermmode_value = flags.setthermmode
+        logger.info(f"sethermmode = {setthermmode_value}")
+        valid_options = ["schedule", "away"]
+        if setthermmode_value in valid_options:
+            netatmo_run = MyNetatmo(settings_file=settings_file)
+            response3 = netatmo_run.setthermmode(mode=setthermmode_value)
+        else:
+            logger.error(f"Use possible values for sethermmode {value_options}")
 
     if flags.daemon:
         logger.info("Launching daemon")
@@ -168,18 +174,6 @@ def main():
         netatmo_run.schedule_daemon()
         while netatmo_run.scheduler_status():
             time.sleep(10)
-
-    if len(sys.argv) > 0:
-        parameter = sys.argv[1]
-    else:
-        parameter = "schedule"
-
-    netatmo_run = MyNetatmo(settings_file=settings_file)
-    netatmo_run.get_netatmo_status()
-    netatmo_run.schedule_daemon()
-    while netatmo_run.scheduler_status():
-        time.sleep(10)
-    response3 = netatmo_run.setthermmode(mode=parameter)
        
     return None
 
