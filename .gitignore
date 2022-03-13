@@ -3,3 +3,4 @@
 *.code-workspace
 **/*.ini
 **/*.pyc
+**/*.log

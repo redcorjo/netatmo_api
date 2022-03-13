@@ -41,7 +41,10 @@ class MyNetatmo():
             filename = config["logging"]["filename"]
         else:
             filename = None
-        logging.basicConfig(format='%(levelname)-8s [%(filename)s:%(lineno)d] - %(message)s', datefmt='%Y-%m-%d:%H:%M:%S', level=severity)
+        if filename == None:
+            logging.basicConfig(format='%(levelname)-8s [%(filename)s:%(lineno)d] - %(message)s', datefmt='%Y-%m-%d:%H:%M:%S', level=severity)
+        else:
+            logging.basicConfig(format='%(levelname)-8s [%(filename)s:%(lineno)d] - %(message)s', datefmt='%Y-%m-%d:%H:%M:%S', level=severity, filename=filename)
         # Credentials
         self.client_id = config["credentials"]["client_id"]
         self.client_secret = config["credentials"]["client_secret"]
