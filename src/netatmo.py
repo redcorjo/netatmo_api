@@ -6,15 +6,16 @@ import os
 import configparser
 import logging
 import time
+import datetime
 import argparse
 from enum import Enum
 from apscheduler.schedulers.background import BackgroundScheduler
 from netatmo_api import Netatmo_API
 from mqtt import MQTT
 
-logging.basicConfig(format='%(levelname)-8s [%(filename)s:%(lineno)d] - %(message)s',
-    datefmt='%Y-%m-%d:%H:%M:%S',
-    level=logging.INFO)
+# logging.basicConfig(format='%(levelname)-8s [%(filename)s:%(lineno)d] - %(message)s',
+#     datefmt='%Y-%m-%d:%H:%M:%S',
+#     level=logging.INFO)
 logger = logging.getLogger(__name__)
 logger.propagate = False
 
@@ -31,6 +32,16 @@ class MyNetatmo():
             self.settings_file = settings_file
         config = self.get_settings_file(self.settings_file)
         self.config = config
+        # Logging 
+        if "severity" in config["logging"]:
+            severity = config["logging"]["severity"]
+        else:
+            severity = "INFO"
+        if "filename" in config["logging"]:
+            filename = config["logging"]["filename"]
+        else:
+            filename = None
+        logging.basicConfig(format='%(levelname)-8s [%(filename)s:%(lineno)d] - %(message)s', datefmt='%Y-%m-%d:%H:%M:%S', level=severity)
         # Credentials
         self.client_id = config["credentials"]["client_id"]
         self.client_secret = config["credentials"]["client_secret"]
@@ -85,18 +96,22 @@ class MyNetatmo():
             config["mqtt"]["port"] = "1883"
             config["global"] = {}
             config["global"]["frequency"] = "5"
+            config["logging"] = {}
+            config["logging"]["severity"] = "INFO"
+            config["logging"]["filename"] = "netatmo.log"
             with open(settings_file, "w") as config_file:
                 config.write(config_file)
         return config
 
     def background_daemon(self):
-        self.mqtt.subscribe_topic(topic="test/test")
+        topic = f"{self.topic}/#"
+        self.mqtt.subscribe_topic(topic=topic)
 
     def schedule_daemon(self):
         if self.scheduler == None:
             self.scheduler = BackgroundScheduler()
         logger.info(f"Schedule daemon with frequency={self.frequency}")
-        self.scheduler.add_job(self.get_netatmo_status, "interval", minutes=self.frequency)
+        self.scheduler.add_job(self.get_netatmo_status, "interval", minutes=self.frequency, next_run_time=datetime.datetime.now())
         self.scheduler.start()
         self.background_daemon()
 

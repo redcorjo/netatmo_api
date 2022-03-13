@@ -3,11 +3,11 @@ import json
 import paho.mqtt.client as paho
 
 
-logging.basicConfig(format='%(levelname)-8s [%(filename)s:%(lineno)d] - %(message)s',
-    datefmt='%Y-%m-%d:%H:%M:%S',
-    level=logging.INFO)
+# logging.basicConfig(format='%(levelname)-8s [%(filename)s:%(lineno)d] - %(message)s',
+#     datefmt='%Y-%m-%d:%H:%M:%S',
+#     level=logging.INFO)
 logger = logging.getLogger(__name__)
-logger.propagate = False
+#logger.propagate = False
 
 class MQTT():
 
@@ -17,6 +17,7 @@ class MQTT():
     client = None
 
     def __init__(self, broker=None, port=None, topic=None):
+        logger.info("Init")
         if broker != None:
             self.broker = broker
         if port != None:
@@ -41,11 +42,12 @@ class MQTT():
         self.client.publish(topic, message)
         pass
 
-    def process_mqtt(self, client, userdata, message):
-        logger.info(f"message received {message.payload}")
-        logger.info("message topic=",message.topic)
-        logger.info("message qos=",message.qos)
-        logger.info("message retain flag=",message.retain)
+    def mqtt_on_message(self, client, userdata, message):
+        if not message.topic.endswith("/status"):
+            logger.info(f"message received {message.payload}")
+            logger.info(f"message topic={message.topic}")
+            logger.info(f"message qos={message.qos}")
+            logger.info(f"message retain flag={message.retain}")
 
     def subscribe_topic(self, topic=None, qos=0):
         if self.client == None:
@@ -53,7 +55,7 @@ class MQTT():
         if topic == None:
             topic = f"{self.topic}/+/update" 
         self.client.subscribe(topic, qos=0)
-        self.client.on_message=self.process_mqtt
+        self.client.on_message=self.mqtt_on_message
         self.client.loop_forever()
 
     def __connect_queue(self):

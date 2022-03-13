@@ -21,6 +21,10 @@ port  = port_value
 
 [global]
 frequency = frequency_value
+
+[logging]
+severity = INFO
+filename = netatmo.log
 ´´´
 
 ## Official documentation from Netatmo
@@ -29,4 +33,4 @@ frequency = frequency_value
 <https://dev.netatmo.com/apidocumentation/energy>
 
 
-Version: 2022031100
+Version: 2022031300

@@ -6,11 +6,11 @@ import os
 import configparser
 import logging
 
-logging.basicConfig(format='%(levelname)-8s [%(filename)s:%(lineno)d] - %(message)s',
-    datefmt='%Y-%m-%d:%H:%M:%S',
-    level=logging.INFO)
+# logging.basicConfig(format='%(levelname)-8s [%(filename)s:%(lineno)d] - %(message)s',
+#     datefmt='%Y-%m-%d:%H:%M:%S',
+#     level=logging.INFO)
 logger = logging.getLogger(__name__)
-logger.propagate = False
+#logger.propagate = False
 
 class Netatmo_API():
 
@@ -20,6 +20,7 @@ class Netatmo_API():
     scopes = "read_station read_thermostat write_thermostat read_camera write_camera access_camera read_presence access_presence read_smokedetector read_homecoach"
 
     def __init__(self, client_id, client_secret, username, password, home_id: str = None, endpoint: str ="https://api.netatmo.com", scopes: str =None):
+        logger.info("Init")
         self.endpoint = endpoint
         self.client_id = client_id
         self.client_secret = client_secret
