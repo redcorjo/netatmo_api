@@ -4,19 +4,19 @@ Project repo: https://github.com/redcorjo/netatmo_api.git
 
 ## Installation steps (as linux user pi)
 
-´´´shell
+```shell
 cd ~
 git clone https://github.com/redcorjo/netatmo_api.git
 cd netatmo_api
 echo "Create settings file"
 vi src/netatmo.ini
 (cd src/service ; ./installer.sh)
-´´´
+```
 
 
 ## Settings file
 
-´´´
+```
 [credentials]
 client_id = client_id_value
 client_secret = client_secret_value
@@ -38,7 +38,7 @@ frequency = frequency_value
 [logging]
 severity = INFO
 filename = netatmo.log
-´´´
+```
 
 ## Official documentation from Netatmo
 
