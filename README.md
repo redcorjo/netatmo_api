@@ -1,6 +1,6 @@
 # Python module for Netatmo
 
-Project repo: https://github.com/redcorjo/netatmo_api.gi
+Project repo: https://github.com/redcorjo/netatmo_api.git
 
 ## Settings file
 

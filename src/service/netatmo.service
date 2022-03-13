@@ -4,7 +4,7 @@ After=multi-user.target
 
 [Service]
 Type=simple
-ExecStart=/usr/bin/python3 /home/pi/netatmo/netatmo.py
+ExecStart=/usr/bin/python3 /home/pi/netatmo/src/netatmo.py
 Restart=on-abort
 
 [Install]
