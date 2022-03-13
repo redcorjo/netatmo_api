@@ -36,14 +36,14 @@ class MQTT():
         else:
             message = json.dumps(payload)
         if item != None:
-            topic = f"{topic}/{item}/status"
+            topic = f"{topic}/{item}/state"
         else:
-            topic = f"{topic}/status"
+            topic = f"{topic}/state"
         self.client.publish(topic, message)
         pass
 
     def mqtt_on_message(self, client, userdata, message):
-        if not message.topic.endswith("/status"):
+        if not message.topic.endswith("/state"):
             logger.info(f"message received {message.payload}")
             logger.info(f"message topic={message.topic}")
             logger.info(f"message qos={message.qos}")

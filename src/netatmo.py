@@ -94,7 +94,7 @@ class MyNetatmo():
             config["home"] = {}
             config["home"]["home_id"] = "your_home_id"
             config["mqtt"] = {}
-            config["mqtt"]["topic"] = "netatmo2mqtt/status"
+            config["mqtt"]["topic"] = "netatmo2mqtt"
             config["mqtt"]["broker"] = "127.0.0.1"
             config["mqtt"]["port"] = "1883"
             config["global"] = {}

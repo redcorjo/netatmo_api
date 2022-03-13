@@ -1,0 +1,7 @@
+Bridge mqtt:broker:mosquitto [ host="127.0.0.1", secure=false ]
+{
+    Thing mqtt:topic:netatmo2mqtt "netatmo - netatmo2mqtt agent" {
+    Channels:
+        Type string : state "zigbee2mqtt queue status" [ stateTopic="netatmo2mqtt/5bf5e579923dfef9448b4a9e/state", allowedStates="online,offline,undefined" ]
+    }
+}
