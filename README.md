@@ -4,7 +4,7 @@ Project repo: https://github.com/redcorjo/netatmo_api.git
 
 ## Installation steps (as linux user pi)
 
-´´´sh
+´´´shell
 cd ~
 git clone https://github.com/redcorjo/netatmo_api.git
 cd netatmo_api
