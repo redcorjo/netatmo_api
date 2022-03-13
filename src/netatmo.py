@@ -24,6 +24,11 @@ class MyNetatmo():
     settings_file = sys.argv[0].replace(".py", ".ini")
     mqtt = None
     scheduler = None
+    all_data = { 
+            "home": {},
+            "room": {},
+            "module": {}
+        }
 
     def __init__(self, settings_file: str = None):
         if settings_file == None:
@@ -131,16 +136,25 @@ class MyNetatmo():
         logger.info("Launching get_netatmo_status")
         netatmo = self.get_netatmo_session()
         homesdata_response = netatmo.homesdata()
+        all_data = { 
+            "home": {},
+            "room": {},
+            "module": {}
+        }
         for homedata in homesdata_response["body"]["homes"]:
             my_home_id = homedata["id"]
+            all_data["home"][my_home_id] = homedata
             self.mqtt.send_message(payload=homedata, item=my_home_id)
             homestatus_response = netatmo.homestatus(home_id=my_home_id)
             for room in homestatus_response["body"]["home"]["rooms"]:
                 item = room["id"]
+                all_data["room"][item] = room
                 self.mqtt.send_message(payload=room, item=item)
             for module in homestatus_response["body"]["home"]["modules"]:
                 item = module["id"]
+                all_data["module"][item] = module
                 self.mqtt.send_message(payload=module, item=item)
+        self.all_data = all_data
         return None
 
     def setthermmode(self, mode="schedule"):
@@ -148,11 +162,16 @@ class MyNetatmo():
         response = netatmo.setthermmode(mode=mode)
         return response
 
+    def create_openhab_template(self):
+        logger.info("Create opehab template file")
+        return None
+
 def get_flags():
     parser = argparse.ArgumentParser()
     parser.add_argument("-c", "--configfile", type=str, help="init config file")
     parser.add_argument("-st", "--setthermmode", type=str, help="setthermmode away or schedule possible values")
     parser.add_argument("-d", "--daemon", help="daemon", action="store_true")
+    parser.add_argument("-oh", "--openhabtemplate", help="Create openhab template", action="store_true")
 
     settings = parser.parse_args()
     return settings
@@ -179,6 +198,12 @@ def main():
             response3 = netatmo_run.setthermmode(mode=setthermmode_value)
         else:
             logger.error(f"Use possible values for sethermmode {value_options}")
+
+    if flags.openhabtemplate:
+        logger.info("Create Openhab template")
+        netatmo_run = MyNetatmo(settings_file=settings_file)
+        netatmo_run.get_netatmo_status()
+        netatmo_run.create_openhab_template()
 
     if flags.daemon:
         logger.info("Launching daemon")
