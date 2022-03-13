@@ -24,9 +24,15 @@ MYDIR=$(pwd)
 APPDIR=$(dirname $0)
 WORKDIR=$(cd ${APPDIR}; cd ../.. ; pwd)
 MYUSER=$(whoami)
+echo "Create service file"
 create_service
 sudo mv /tmp/netatmo.service /lib/systemd/system/netatmo.service
+echo "Reload daemon"
 sudo systemctl daemon-reload
+echo "Enable daemon"
 sudo systemctl enable netatmo.service
+echo "Start daemon"
 sudo systemctl start netatmo.service
+echo "Check status daemon"
+sudo systemctl status netatmo.service
 exit
