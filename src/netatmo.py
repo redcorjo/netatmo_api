@@ -91,7 +91,6 @@ class MyNetatmo():
 
     def background_daemon(self):
         self.mqtt.subscribe_topic(topic="test/test")
-        pass
 
     def schedule_daemon(self):
         if self.scheduler == None:
@@ -99,6 +98,7 @@ class MyNetatmo():
         logger.info(f"Schedule daemon with frequency={self.frequency}")
         self.scheduler.add_job(self.get_netatmo_status, "interval", minutes=self.frequency)
         self.scheduler.start()
+        self.background_daemon()
 
     def scheduler_status(self):
         return self.scheduler.running
@@ -129,16 +129,6 @@ class MyNetatmo():
         netatmo = self.get_netatmo_session()
         response = netatmo.setthermmode(mode=mode)
         return response
-
-# def launch_daemon():
-#     logger.info("Launched daemon")
-#     netatmo_run = MyNetatmo()
-#     netatmo_run.background_daemon()
-#     netatmo_run.get_netatmo_status()
-#     netatmo_run.schedule_daemon()
-#     while netatmo_run.scheduler_status():
-#         time.sleep(10)
-
 
 def get_flags():
     parser = argparse.ArgumentParser()
@@ -175,11 +165,8 @@ def main():
     if flags.daemon:
         logger.info("Launching daemon")
         netatmo_run = MyNetatmo(settings_file=settings_file)
-        #netatmo_run.background_daemon()
         netatmo_run.get_netatmo_status()
         netatmo_run.schedule_daemon()
-        while netatmo_run.scheduler_status():
-            time.sleep(10)
        
     return None
 
