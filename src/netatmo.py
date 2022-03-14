@@ -254,14 +254,14 @@ class MyNetatmo():
                 my_file.write(data_things)
         else:
             logger.error(f"openhab basedir {openhab_basedir}/things is not present ")
-        return data
+        return data_things
 
 def get_flags():
     parser = argparse.ArgumentParser()
     parser.add_argument("-c", "--configfile", type=str, help="init config file")
     parser.add_argument("-st", "--setthermmode", type=str, help="setthermmode away or schedule possible values")
     parser.add_argument("-d", "--daemon", help="daemon", action="store_true")
-    parser.add_argument("-oh", "--openhabtemplate", help="Create openhab template", action="store_true")
+    parser.add_argument("-oh", "--openhabtemplate", type=str, help="Create openhab template")
 
     settings = parser.parse_args()
     return settings
@@ -293,6 +293,7 @@ def main():
         logger.info("Create Openhab template")
         netatmo_run = MyNetatmo(settings_file=settings_file)
         netatmo_run.get_netatmo_status()
+        opehhab_basedir = flags.openhabtemplate
         netatmo_run.create_openhab_template(opehhab_basedir="tmp/openhab")
 
     if flags.daemon:
