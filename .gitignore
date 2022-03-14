@@ -4,3 +4,6 @@
 **/*.ini
 **/*.pyc
 **/*.log
+**/*.things
+**/*.items
+**/*.sitemap
