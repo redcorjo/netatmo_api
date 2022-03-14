@@ -8,3 +8,4 @@
 **/*.items
 **/*.sitemap
 tmp/**
+**/__pycache__ 
