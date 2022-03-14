@@ -250,7 +250,7 @@ class MyNetatmo():
         data_things = template.render(self.all_data)
         things_file = opehhab_basedir + "/things/netatmo.things"
         if os.path.exists(opehhab_basedir + "/things"):
-            with open("netatmo.things", "w") as my_file:
+            with open(things_file, "w") as my_file:
                 my_file.write(data_things)
         else:
             logger.error(f"openhab basedir {openhab_basedir}/things is not present ")
@@ -293,7 +293,7 @@ def main():
         logger.info("Create Openhab template")
         netatmo_run = MyNetatmo(settings_file=settings_file)
         netatmo_run.get_netatmo_status()
-        netatmo_run.create_openhab_template()
+        netatmo_run.create_openhab_template(opehhab_basedir="tmp/openhab")
 
     if flags.daemon:
         logger.info("Launching daemon")
