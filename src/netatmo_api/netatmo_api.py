@@ -49,9 +49,13 @@ class Netatmo_API():
             "scope": self.scopes
         }
         response = requests.post(self.endpoint + "/oauth2/token", data=request_body, headers=headers)
-        payload = json.loads(response.text)
-        token = payload["access_token"]
-        self.token = token
+        if response.status_code == 200:
+            payload = json.loads(response.text)
+            token = payload["access_token"]
+            self.token = token
+        else:
+            logger.error(f"Remote api returned error code {{response.status_code}} . {{response.text}} ")
+            token = None
         return token
 
     def homesdata(self, home_id: str = None,  gateways_types: list = None):
