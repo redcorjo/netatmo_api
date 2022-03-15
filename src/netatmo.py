@@ -221,7 +221,7 @@ class MyNetatmo():
 
     // Modules
     {%for module in modules if module.home_id == my_home.id  -%}
-        Thing mqtt:topic:netatmo2mqttmodule{{module.id}} "netatmo2mqtt module {{module.name}} home {{my_home.id}}" {
+        Thing mqtt:topic:netatmo2mqttmodule{{module.label}} "netatmo2mqtt module {{module.name}} home {{my_home.id}}" {
         Channels:
             Type string     : id                        "netatmo2mqtt module {{module.name}} id"                                    [ stateTopic="{{topic}}/{{module.id}}/state", transformationPattern="JSONPATH:.id"]
             Type string     : type                      "netatmo2mqtt module {{module.name}} type"                                  [ stateTopic="{{topic}}/{{module.id}}/state", transformationPattern="JSONPATH:.type"]
@@ -281,27 +281,27 @@ class MyNetatmo():
 
     // Modules
     {%for module in modules if module.home_id == my_home.id  -%}
-            String netatmo_module_{{module.label}}_id                        "netatmo2mqtt module {{module.name}} id"                                           { channel="mqtt:topic:mosquitto:netatmo2mqttmodule{{module.id}}:id"}
-            String netatmo_module_{{module.label}}_type                      "netatmo2mqtt module {{module.name}} type"                                         { channel="mqtt:topic:mosquitto:netatmo2mqttmodule{{module.id}}:type"}
-            String netatmo_module_{{module.label}}_name                      "netatmo2mqtt module {{module.name}} name"            <radiator>                   { channel="mqtt:topic:mosquitto:netatmo2mqttmodule{{module.id}}:name"}
-            Number netatmo_module_{{module.label}}_setup_date                "netatmo2mqtt module {{module.name}} setup_date"                                   { channel="mqtt:topic:mosquitto:netatmo2mqttmodule{{module.id}}:setup_date"}
-            String netatmo_module_{{module.label}}_home_id                   "netatmo2mqtt module {{module.name}} home_id"                                      { channel="mqtt:topic:mosquitto:netatmo2mqttmodule{{module.id}}:home_id"}
+            String netatmo_module_{{module.label}}_id                        "netatmo2mqtt module {{module.name}} id"                                           { channel="mqtt:topic:mosquitto:netatmo2mqttmodule{{module.label}}:id"}
+            String netatmo_module_{{module.label}}_type                      "netatmo2mqtt module {{module.name}} type"                                         { channel="mqtt:topic:mosquitto:netatmo2mqttmodule{{module.label}}:type"}
+            String netatmo_module_{{module.label}}_name                      "netatmo2mqtt module {{module.name}} name"            <radiator>                   { channel="mqtt:topic:mosquitto:netatmo2mqttmodule{{module.label}}:name"}
+            Number netatmo_module_{{module.label}}_setup_date                "netatmo2mqtt module {{module.name}} setup_date"                                   { channel="mqtt:topic:mosquitto:netatmo2mqttmodule{{module.label}}:setup_date"}
+            String netatmo_module_{{module.label}}_home_id                   "netatmo2mqtt module {{module.name}} home_id"                                      { channel="mqtt:topic:mosquitto:netatmo2mqttmodule{{module.label}}:home_id"}
             {% if module.type == "NAPlug" %}
-            //netatmo_module_{{module.label}}_setup_date                "netatmo2mqtt module {{module.name}} setup_date"                                   { channel="mqtt:topic:mosquitto:netatmo2mqttmodule{{module.id}}:setup_date"}
-            Number netatmo_module_{{module.label}}_wifi_strength             "netatmo2mqtt module {{module.name}} wifi_strength"                                { channel="mqtt:topic:mosquitto:netatmo2mqttmodule{{module.id}}:wifi_strength"}
+            //netatmo_module_{{module.label}}_setup_date                "netatmo2mqtt module {{module.name}} setup_date"                                   { channel="mqtt:topic:mosquitto:netatmo2mqttmodule{{module.label}}:setup_date"}
+            Number netatmo_module_{{module.label}}_wifi_strength             "netatmo2mqtt module {{module.name}} wifi_strength"                                { channel="mqtt:topic:mosquitto:netatmo2mqttmodule{{module.label}}:wifi_strength"}
             {% endif %}
             {% if module.type == "NATherm1" %}
-            Switch netatmo_module_{{module.label}}_boiler_valve_comfort_boost "netatmo2mqtt module {{module.name}} boiler_valve_comfort_boost"                  { channel="mqtt:topic:mosquitto:netatmo2mqttmodule{{module.id}}:boiler_valve_comfort_boost"}
+            Switch netatmo_module_{{module.label}}_boiler_valve_comfort_boost "netatmo2mqtt module {{module.name}} boiler_valve_comfort_boost"                  { channel="mqtt:topic:mosquitto:netatmo2mqttmodule{{module.label}}:boiler_valve_comfort_boost"}
             {% endif %}
             {% if module.type != "NAPlug" %}
-            String netatmo_module_{{module.label}}_bridge                    "netatmo2mqtt module {{module.name}} bridge"                                       { channel="mqtt:topic:mosquitto:netatmo2mqttmodule{{module.id}}:bridge"}
-            String netatmo_module_{{module.label}}_battery_state             "netatmo2mqtt module {{module.name}} battery_state"    <battery>                   { channel="mqtt:topic:mosquitto:netatmo2mqttmodule{{module.id}}:battery_state"}
-            Number netatmo_module_{{module.label}}_battery_level             "netatmo2mqtt module {{module.name}} battery_level"    <batterylevel>              { channel="mqtt:topic:mosquitto:netatmo2mqttmodule{{module.id}}:battery_level"}
-            String netatmo_module_{{module.label}}_firmware_revision         "netatmo2mqtt module {{module.name}} firmware_revision"                            { channel="mqtt:topic:mosquitto:netatmo2mqttmodule{{module.id}}:firmware_revision"}
-            Number netatmo_module_{{module.label}}_rf_strength               "netatmo2mqtt module {{module.name}} rf_strength"     <network>                    { channel="mqtt:topic:mosquitto:netatmo2mqttmodule{{module.id}}:rf_strength"}
-            Switch netatmo_module_{{module.label}}_reachable                 "netatmo2mqtt module {{module.name}} reachable"                                    { channel="mqtt:topic:mosquitto:netatmo2mqttmodule{{module.id}}:reachable"}
-            Switch netatmo_module_{{module.label}}_boiler_status             "netatmo2mqtt module {{module.name}} boiler_status"   <heating>                    { channel="mqtt:topic:mosquitto:netatmo2mqttmodule{{module.id}}:boiler_status"}
-            Number netatmo_module_{{module.label}}_room_id                   "netatmo2mqtt module {{module.name}} room_id"                                      { channel="mqtt:topic:mosquitto:netatmo2mqttmodule{{module.id}}:room_id"}
+            String netatmo_module_{{module.label}}_bridge                    "netatmo2mqtt module {{module.name}} bridge"                                       { channel="mqtt:topic:mosquitto:netatmo2mqttmodule{{module.label}}:bridge"}
+            String netatmo_module_{{module.label}}_battery_state             "netatmo2mqtt module {{module.name}} battery_state"    <battery>                   { channel="mqtt:topic:mosquitto:netatmo2mqttmodule{{module.label}}:battery_state"}
+            Number netatmo_module_{{module.label}}_battery_level             "netatmo2mqtt module {{module.name}} battery_level"    <batterylevel>              { channel="mqtt:topic:mosquitto:netatmo2mqttmodule{{module.label}}:battery_level"}
+            String netatmo_module_{{module.label}}_firmware_revision         "netatmo2mqtt module {{module.name}} firmware_revision"                            { channel="mqtt:topic:mosquitto:netatmo2mqttmodule{{module.label}}:firmware_revision"}
+            Number netatmo_module_{{module.label}}_rf_strength               "netatmo2mqtt module {{module.name}} rf_strength"     <network>                    { channel="mqtt:topic:mosquitto:netatmo2mqttmodule{{module.label}}:rf_strength"}
+            Switch netatmo_module_{{module.label}}_reachable                 "netatmo2mqtt module {{module.name}} reachable"                                    { channel="mqtt:topic:mosquitto:netatmo2mqttmodule{{module.label}}:reachable"}
+            Switch netatmo_module_{{module.label}}_boiler_status             "netatmo2mqtt module {{module.name}} boiler_status"   <heating>                    { channel="mqtt:topic:mosquitto:netatmo2mqttmodule{{module.label}}:boiler_status"}
+            Number netatmo_module_{{module.label}}_room_id                   "netatmo2mqtt module {{module.name}} room_id"                                      { channel="mqtt:topic:mosquitto:netatmo2mqttmodule{{module.label}}:room_id"}
             {% endif %}
     {% endfor %}
     {% endfor %}
