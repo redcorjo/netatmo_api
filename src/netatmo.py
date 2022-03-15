@@ -143,10 +143,10 @@ class MyNetatmo():
             "rooms": [],
             "modules": []
         }
+        all_homes = []
         for homedata in homesdata_response["body"]["homes"]:
             my_home_id = homedata["id"]
             all_data["homes"].append(homedata)
-            self.mqtt.send_message(payload=homedata, item=my_home_id)
             homestatus_response = netatmo.homestatus(home_id=my_home_id)
             if "rooms" in homestatus_response["body"]["home"]:
                 for room in homestatus_response["body"]["home"]["rooms"]:
@@ -156,6 +156,8 @@ class MyNetatmo():
                         for room_item in home_item["rooms"]:
                             if room["id"] == room_item["id"]:
                                 room = {**room , **room_item}
+                    if "module_ids" in room:
+                        del room["module_ids"]
                     all_data["rooms"].append(room)
                     self.mqtt.send_message(payload=room, item=item)
             else:
@@ -169,10 +171,21 @@ class MyNetatmo():
                             if module["id"] == module_item["id"]:
                                 module = {**module, **module_item}
                                 module["label"] = module["id"].replace(":", "")
+                    if "modules_bridged" in module:
+                        del module["modules_bridged"]
                     all_data["modules"].append(module)
                     self.mqtt.send_message(payload=module, item=item)
             else:
                 logger.error("Not found any modules at response")
+            if "rooms" in homedata:
+                del homedata["rooms"]
+            if "modules" in homedata:
+                del homedata["modules"]
+            if "schedules" in homedata:
+                del homedata["schedules"]
+            self.mqtt.send_message(payload=homedata, item=my_home_id)
+            all_homes.append(homedata)
+        all_data["homes"] = all_homes
         all_data["broker"] = self.broker
         all_data["port"] = self.port
         all_data["topic"] = self.topic
