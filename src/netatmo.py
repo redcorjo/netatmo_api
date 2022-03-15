@@ -173,6 +173,11 @@ class MyNetatmo():
                             if module["id"] == module_item["id"]:
                                 module = {**module, **module_item}
                                 module["label"] = module["id"].replace(":", "")
+                    if "setup_date" in module:
+                        # "yyyy-MM-dd'T'HH:mm:ss.SSSZ"
+                        my_formatted_time = time.strftime("%Y-%m-%dT%H:%M:%S.000Z", time.localtime(module["setup_date"]))
+                        #my_fomratted_time = datetime.datetime.fromtimestamp(module["setup_date"]).strftime('yyyy-MM-dd'T'HH:mm:ssZ')
+                        module["setup_date"] = my_formatted_time
                     if "modules_bridged" in module:
                         del module["modules_bridged"]
                     all_data["modules"].append(module)
