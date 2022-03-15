@@ -21,16 +21,16 @@
     Thing mqtt:topic:netatmoroom{{room.id}} "netatmo2mqtt room {{room.name}} home {{my_home.id}}" {
     Channels:
         Type string         : id                          "netatmo2mqtt room {{room.name}} id"                            [ stateTopic="{{topic}}/{{room.id}}/state", transformationPattern="JSONPATH:.id"]
-        Type string         : name                        "netatmo2mqtt room {{room.name}} name"                          [ stateTopic="{{topic}}/{{room.name}}/state", transformationPattern="JSONPATH:.name"]
-        Type string         : type                        "netatmo2mqtt room {{room.name}} type"                          [ stateTopic="{{topic}}/{{room.type}}/state", transformationPattern="JSONPATH:.type"]
-        Type switch         : reachable                   "netatmo2mqtt room {{room.name}} reachable"                     [ stateTopic="{{topic}}/{{room.type}}/state", transformationPattern="JSONPATH:.reachable",on="true", off="false"]
-        Type switch         : anticipating                "netatmo2mqtt room {{room.name}} anticipating"                  [ stateTopic="{{topic}}/{{room.type}}/state", transformationPattern="JSONPATH:.anticipating",on="true", off="false"]
-        Type number         : heating_power_request       "netatmo2mqtt room {{room.name}} heating_power_request"         [ stateTopic="{{topic}}/{{room.type}}/state", transformationPattern="JSONPATH:.heating_power_request"]
-        Type switch         : open_window                 "netatmo2mqtt room {{room.name}} open_window"                   [ stateTopic="{{topic}}/{{room.type}}/state", transformationPattern="JSONPATH:.open_window",on="true", off="false"]
-        Type number         : therm_measured_temperature  "netatmo2mqtt room {{room.name}} therm_measured_temperature"    [ stateTopic="{{topic}}/{{room.type}}/state", transformationPattern="JSONPATH:.therm_measured_temperature"]
-        Type number         : therm_setpoint_temperature  "netatmo2mqtt room {{room.name}} therm_setpoint_temperature"    [ stateTopic="{{topic}}/{{room.type}}/state", transformationPattern="JSONPATH:.therm_setpoint_temperature"]
-        Type number         : therm_setpoint_mode         "netatmo2mqtt room {{room.name}} therm_setpoint_mode"           [ stateTopic="{{topic}}/{{room.type}}/state", transformationPattern="JSONPATH:.therm_setpoint_mode"]
-        Type string         : home_id                     "netatmo2mqtt room {{room.name}} home_id"                       [ stateTopic="{{topic}}/{{room.type}}/state", transformationPattern="JSONPATH:.home_id"]
+        Type string         : name                        "netatmo2mqtt room {{room.name}} name"                          [ stateTopic="{{topic}}/{{room.id}}/state", transformationPattern="JSONPATH:.name"]
+        Type string         : type                        "netatmo2mqtt room {{room.name}} type"                          [ stateTopic="{{topic}}/{{room.id}}/state", transformationPattern="JSONPATH:.type"]
+        Type switch         : reachable                   "netatmo2mqtt room {{room.name}} reachable"                     [ stateTopic="{{topic}}/{{room.id}}/state", transformationPattern="JSONPATH:.reachable",on="true", off="false"]
+        Type switch         : anticipating                "netatmo2mqtt room {{room.name}} anticipating"                  [ stateTopic="{{topic}}/{{room.id}}/state", transformationPattern="JSONPATH:.anticipating",on="true", off="false"]
+        Type number         : heating_power_request       "netatmo2mqtt room {{room.name}} heating_power_request"         [ stateTopic="{{topic}}/{{room.id}}/state", transformationPattern="JSONPATH:.heating_power_request"]
+        Type switch         : open_window                 "netatmo2mqtt room {{room.name}} open_window"                   [ stateTopic="{{topic}}/{{room.id}}/state", transformationPattern="JSONPATH:.open_window",on="true", off="false"]
+        Type number         : therm_measured_temperature  "netatmo2mqtt room {{room.name}} therm_measured_temperature"    [ stateTopic="{{topic}}/{{room.id}}/state", transformationPattern="JSONPATH:.therm_measured_temperature"]
+        Type number         : therm_setpoint_temperature  "netatmo2mqtt room {{room.name}} therm_setpoint_temperature"    [ stateTopic="{{topic}}/{{room.id}}/state", transformationPattern="JSONPATH:.therm_setpoint_temperature"]
+        Type number         : therm_setpoint_mode         "netatmo2mqtt room {{room.name}} therm_setpoint_mode"           [ stateTopic="{{topic}}/{{room.id}}/state", transformationPattern="JSONPATH:.therm_setpoint_mode"]
+        Type string         : home_id                     "netatmo2mqtt room {{room.name}} home_id"                       [ stateTopic="{{topic}}/{{room.id}}/state", transformationPattern="JSONPATH:.home_id"]
     }
 {% endfor %}
 
