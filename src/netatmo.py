@@ -308,41 +308,43 @@ class MyNetatmo():
         """
         template_sitemaps="""
     sitemap netatmo label="Netatmo" {
+    Frame {
+        Text label="Homes"
     // Homes
     {% for my_home in homes -%}
-            Frame 
             {
                 Text label="Home {{my_home.id}}" 
                 {
-                    Default item=netatmo_home_{{my_home.id}}_id                               label="netatmo2mqtt {{my_home.name}} id"                        
-                    Default item=netatmo_home_{{my_home.id}}_name                             label="netatmo2mqtt {{my_home.name}} name"                           
-                    Default item=netatmo_home_{{my_home.id}}_altitude                         label="netatmo2mqtt {{my_home.name}} altitude"                       
-                    Default item=netatmo_home_{{my_home.id}}_coordinates                      label="netatmo2mqtt {{my_home.name}} coordinates [%2$s°N %3$s°E]"    
-                    Default item=netatmo_home_{{my_home.id}}_country                          label="netatmo2mqtt {{my_home.name}} country"                        
-                    Default item=netatmo_home_{{my_home.id}}_timezone                         label="netatmo2mqtt {{my_home.name}} timezone"                       
-                    Default item=netatmo_home_{{my_home.id}}_temperature_control_mode         label="netatmo2mqtt {{my_home.name}} temperature_control_mode"       
-                    Default item=netatmo_home_{{my_home.id}}_therm_mode                       label="netatmo2mqtt {{my_home.name}} therm_mode"                     
-                    Default item=netatmo_home_{{my_home.id}}_therm_setpoint_default_duration  label="netatmo2mqtt {{my_home.name}} therm_setpoint_default_duration"
-                    Default item=netatmo_home_{{my_home.id}}_cooling_mode                     label="netatmo2mqtt {{my_home.name}} cooling_mode"                   
+                    Default item=netatmo_home_{{my_home.id}}_id                               label="{{my_home.name}} id"                        
+                    Default item=netatmo_home_{{my_home.id}}_name                             label="{{my_home.name}} name"                           
+                    Default item=netatmo_home_{{my_home.id}}_altitude                         label="{{my_home.name}} altitude"                       
+                    Default item=netatmo_home_{{my_home.id}}_coordinates                      label="{{my_home.name}} coordinates [%2$s°N %3$s°E]"    
+                    Default item=netatmo_home_{{my_home.id}}_country                          label="{{my_home.name}} country"                        
+                    Default item=netatmo_home_{{my_home.id}}_timezone                         label="{{my_home.name}} timezone"                       
+                    Default item=netatmo_home_{{my_home.id}}_temperature_control_mode         label="{{my_home.name}} temperature_control_mode"       
+                    Default item=netatmo_home_{{my_home.id}}_therm_mode                       label="{{my_home.name}} therm_mode"                     
+                    Default item=netatmo_home_{{my_home.id}}_therm_setpoint_default_duration  label="{{my_home.name}} therm_setpoint_default_duration"
+                    Default item=netatmo_home_{{my_home.id}}_cooling_mode                     label="{{my_home.name}} cooling_mode"                   
                 }
             }
+        }
 
     // Rooms
     {%for room in rooms if room.home_id == my_home.id -%}
             Frame {
                 Text label="Room {{room.name}}"
                 {
-                    Default item=netatmo_room_{{room.id}}_id                          label="netatmo2mqtt room {{room.name}} id"                                               
-                    Default item=netatmo_room_{{room.id}}_name                        label="netatmo2mqtt room {{room.name}} name"                                             
-                    Default item=netatmo_room_{{room.id}}_type                        label="netatmo2mqtt room {{room.name}} type"                                             
-                    Default item=netatmo_room_{{room.id}}_reachable                   label="netatmo2mqtt room {{room.name}} reachable"                                        
-                    Default item=netatmo_room_{{room.id}}_anticipating                label="netatmo2mqtt room {{room.name}} anticipating"                                     
-                    Default item=netatmo_room_{{room.id}}_heating_power_request       label="netatmo2mqtt room {{room.name}} heating_power_request"                            
-                    Default item=netatmo_room_{{room.id}}_open_window                 label="netatmo2mqtt room {{room.name}} open_window"                            
-                    Default item=netatmo_room_{{room.id}}_therm_measured_temperature  label="netatmo2mqtt room {{room.name}} therm_measured_temperature [%.2f °C]" 
-                    Default item=netatmo_room_{{room.id}}_therm_setpoint_temperature  label="netatmo2mqtt room {{room.name}} therm_setpoint_temperature [%.2f °C]"       
-                    Default item=netatmo_room_{{room.id}}_therm_setpoint_mode         label="netatmo2mqtt room {{room.name}} therm_setpoint_mode"                              
-                    Default item=netatmo_room_{{room.id}}_home_id                     label="netatmo2mqtt room {{room.name}} home_id"                                          
+                    Default item=netatmo_room_{{room.id}}_id                          label="{{room.name}} id"                                               
+                    Default item=netatmo_room_{{room.id}}_name                        label="{{room.name}} name"                                             
+                    Default item=netatmo_room_{{room.id}}_type                        label="{{room.name}} type"                                             
+                    Default item=netatmo_room_{{room.id}}_reachable                   label="{{room.name}} reachable"                                        
+                    Default item=netatmo_room_{{room.id}}_anticipating                label="{{room.name}} anticipating"                                     
+                    Default item=netatmo_room_{{room.id}}_heating_power_request       label="{{room.name}} heating_power_request"                            
+                    Default item=netatmo_room_{{room.id}}_open_window                 label="{{room.name}} open_window"                            
+                    Default item=netatmo_room_{{room.id}}_therm_measured_temperature  label="{{room.name}} therm_measured_temperature [%.2f °C]" 
+                    Default item=netatmo_room_{{room.id}}_therm_setpoint_temperature  label="{{room.name}} therm_setpoint_temperature [%.2f °C]"       
+                    Default item=netatmo_room_{{room.id}}_therm_setpoint_mode         label="{{room.name}} therm_setpoint_mode"                              
+                    Default item=netatmo_room_{{room.id}}_home_id                     label="{{room.name}} home_id"                                          
                 }
             }
     {% endfor %}
@@ -351,7 +353,7 @@ class MyNetatmo():
     {%for module in modules if module.home_id == my_home.id  -%}
             Frame {
                 Text label="Module {{module.name}}"
-                {
+                    {
                     Default item=netatmo_module_{{module.label}}_id                        label="netatmo2mqtt module {{module.name}} id"                                           
                     Default item=netatmo_module_{{module.label}}_type                      label="netatmo2mqtt module {{module.name}} type"                                         
                     Default item=netatmo_module_{{module.label}}_name                      label="netatmo2mqtt module {{module.name}} name"            
@@ -373,11 +375,11 @@ class MyNetatmo():
                     Default item=netatmo_module_{{module.label}}_reachable                 label="netatmo2mqtt module {{module.name}} reachable"                                    
                     Default item=netatmo_module_{{module.label}}_boiler_status             label="netatmo2mqtt module {{module.name}} boiler_status"   
                     Default item=netatmo_module_{{module.label}}_room_id                   label="netatmo2mqtt module {{module.name}} room_id"       
-                }                               
-            }
-            {% endif %}
-    }
+                    {% endif %}
+                    }
+                }
     {% endfor %}
+    }
     {% endfor %}
         """
         # Template things
