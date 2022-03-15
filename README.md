@@ -13,6 +13,17 @@ vi src/netatmo.ini
 (cd src/service ; ./installer.sh)
 ```
 
+## Create netatmo openhab files
+
+Let's assume we expect creating all three files 
+
+1. /etc/openhab/things/netatmo.things
+2. /etc/openhab/items/netatmo.items
+3. /etc/openhab/sitemaps/netatmo.sitemap
+
+```shell
+sudo ./netatmo.py  -oh /etc/openhab
+```
 
 ## Settings file
 
@@ -46,4 +57,4 @@ filename = netatmo.log
 <https://dev.netatmo.com/apidocumentation/energy>
 
 
-Version: 2022031500
+Version: 2022031501
