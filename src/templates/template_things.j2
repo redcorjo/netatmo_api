@@ -7,7 +7,7 @@
         Type string   : id "netatmo2mqtt {{my_home.name}} id" [ stateTopic="{{topic}}/{{my_home.id}}/state", transformationPattern="JSONPATH:.id"]
         Type string   : name "netatmo2mqtt {{my_home.name}} name" [ stateTopic="{{topic}}/{{my_home.id}}/state", transformationPattern="JSONPATH:.name"]
         Type number   : altitude "netatmo2mqtt {{my_home.name}} altitude" [ stateTopic="{{topic}}/{{my_home.id}}/state", transformationPattern="JSONPATH:.altitude"]
-        //Type location : coordinates "netatmo2mqtt {{my_home.name}} coordinates" [ stateTopic="{{topic}}/{{my_home.id}}/state", transformationPattern="JSONPATH:.coordinates"]
+        Type location : coordinates "netatmo2mqtt {{my_home.name}} coordinates" [ stateTopic="{{topic}}/{{my_home.id}}/state", transformationPattern="JSONPATH:.coordinates"]
         Type string   : country "netatmo2mqtt {{my_home.name}} country" [ stateTopic="{{topic}}/{{my_home.id}}/state", transformationPattern="JSONPATH:.country"]
         Type string   : timezone "netatmo2mqtt {{my_home.name}} timezone" [ stateTopic="{{topic}}/{{my_home.id}}/state", transformationPattern="JSONPATH:.timezone"]
         Type string   : temperature_control_mode "netatmo2mqtt {{my_home.name}} temperature_control_mode" [ stateTopic="{{topic}}/{{my_home.id}}/state", transformationPattern="JSONPATH:.temperature_control_mode"]

@@ -146,6 +146,8 @@ class MyNetatmo():
         all_homes = []
         for homedata in homesdata_response["body"]["homes"]:
             my_home_id = homedata["id"]
+            if "coordinates" in homedata and "altitude" in homedata:
+                homedata["coordinates"] = "{0},{1},{2}".format(homedata["coordinates"][0],homedata["coordinates"][1], homedata["altitude"] )
             all_data["homes"].append(homedata)
             homestatus_response = netatmo.homestatus(home_id=my_home_id)
             if "rooms" in homestatus_response["body"]["home"]:
