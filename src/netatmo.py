@@ -164,7 +164,7 @@ class MyNetatmo():
                     for module_item in home_item["modules"]:
                         if module["id"] == module_item["id"]:
                             module = {**module, **module_item}
-                            module["label"] = module["name"].replace(" ", "_")
+                            module["label"] = module["id"].replace(":", "")
                 all_data["modules"].append(module)
                 self.mqtt.send_message(payload=module, item=item)
         all_data["broker"] = self.broker
