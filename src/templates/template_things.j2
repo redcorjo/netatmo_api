@@ -29,7 +29,7 @@
         Type switch         : open_window                 "netatmo2mqtt room {{room.name}} open_window"                   [ stateTopic="{{topic}}/{{room.id}}/state", transformationPattern="JSONPATH:.open_window",on="true", off="false"]
         Type number         : therm_measured_temperature  "netatmo2mqtt room {{room.name}} therm_measured_temperature"    [ stateTopic="{{topic}}/{{room.id}}/state", transformationPattern="JSONPATH:.therm_measured_temperature"]
         Type number         : therm_setpoint_temperature  "netatmo2mqtt room {{room.name}} therm_setpoint_temperature"    [ stateTopic="{{topic}}/{{room.id}}/state", transformationPattern="JSONPATH:.therm_setpoint_temperature"]
-        Type number         : therm_setpoint_mode         "netatmo2mqtt room {{room.name}} therm_setpoint_mode"           [ stateTopic="{{topic}}/{{room.id}}/state", transformationPattern="JSONPATH:.therm_setpoint_mode"]
+        Type string         : therm_setpoint_mode         "netatmo2mqtt room {{room.name}} therm_setpoint_mode"           [ stateTopic="{{topic}}/{{room.id}}/state", transformationPattern="JSONPATH:.therm_setpoint_mode"]
         Type string         : home_id                     "netatmo2mqtt room {{room.name}} home_id"                       [ stateTopic="{{topic}}/{{room.id}}/state", transformationPattern="JSONPATH:.home_id"]
     }
 {% endfor %}
