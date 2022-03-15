@@ -15,7 +15,8 @@
         Type string   : therm_setpoint_default_duration "netatmo2mqtt {{my_home.name}} therm_setpoint_default_duration" [ stateTopic="{{topic}}/{{my_home.id}}/state", transformationPattern="JSONPATH:.therm_setpoint_default_duration"]
         Type string   : cooling_mode "netatmo2mqtt {{my_home.name}} cooling_mode" [ stateTopic="{{topic}}/{{my_home.id}}/state", transformationPattern="JSONPATH:.cooling_mode"]
     }
-
+{% endfor %}
+{% for my_home in homes -%}
 // Rooms
 {%for room in rooms if room.home_id == my_home.id -%}
     Thing mqtt:topic:netatmoroom{{room.id}} "netatmo2mqtt room {{room.name}} home {{my_home.id}}" {

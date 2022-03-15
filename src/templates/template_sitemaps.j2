@@ -18,7 +18,9 @@ Frame {
             Default item=netatmo_home_{{my_home.id}}_cooling_mode                     label="{{my_home.name}} cooling_mode"                   
         }
     }
+{% endfor %}
 }
+{% for my_home in homes -%}
 
 // Rooms
 {%for room in rooms if room.home_id == my_home.id -%}

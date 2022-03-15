@@ -12,6 +12,8 @@ String netatmo_home_{{my_home.id}}_therm_mode                       "netatmo2mqt
 Number netatmo_home_{{my_home.id}}_therm_setpoint_default_duration  "netatmo2mqtt {{my_home.name}} therm_setpoint_default_duration" { channel="mqtt:topic:netatmohome{{my_home.id}}:therm_setpoint_default_duration"}
 String netatmo_home_{{my_home.id}}_cooling_mode                     "netatmo2mqtt {{my_home.name}} cooling_mode"                    { channel="mqtt:topic:netatmohome{{my_home.id}}:cooling_mode"}
 
+{% endfor %}
+{% for my_home in homes -%}
 // Rooms
 {%for room in rooms if room.home_id == my_home.id -%}
 // Room {{room.name}}
