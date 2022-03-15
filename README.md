@@ -46,4 +46,4 @@ filename = netatmo.log
 <https://dev.netatmo.com/apidocumentation/energy>
 
 
-Version: 2022031300
+Version: 2022031500

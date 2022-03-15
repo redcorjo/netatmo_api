@@ -262,8 +262,11 @@ def get_flags():
     parser.add_argument("-st", "--setthermmode", type=str, help="setthermmode away or schedule possible values")
     parser.add_argument("-d", "--daemon", help="daemon", action="store_true")
     parser.add_argument("-oh", "--openhabtemplate", type=str, help="Create openhab template")
-
-    settings = parser.parse_args()
+    try:
+        settings = parser.parse_args()
+    except:
+        parser.print_help()
+        sys.exit(1)
     return settings
        
 
