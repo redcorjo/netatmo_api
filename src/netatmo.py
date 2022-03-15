@@ -395,7 +395,12 @@ class MyNetatmo():
         return data_things, data_items, data_sitemaps
 
     def create_openhab_file(self, openhab_basedir, data, mode="things"):
-        target_file = openhab_basedir + "/" + mode + "/netatmo." + mode
+        if mode == "sitemaps":
+            extension = "sitemap"
+        else:
+            extension = mode
+        
+        target_file = openhab_basedir + "/" + mode + "/netatmo." + extension
         if os.path.exists(openhab_basedir + "/" + mode):
             with open(target_file, "w") as my_file:
                 my_file.write(data)
