@@ -18,7 +18,8 @@ from mqtt import MQTT
 #     datefmt='%Y-%m-%d:%H:%M:%S',
 #     level=logging.INFO)
 logger = logging.getLogger(__name__)
-logger.propagate = False
+logger.setLevel(logging.INFO)
+#logger.propagate = False
 
 class MyNetatmo():
 
@@ -176,14 +177,16 @@ class MyNetatmo():
         response = netatmo.setthermmode(mode=mode)
         return response
 
-    def create_openhab_template(self, opehhab_basedir="/etc/openhab"):
-        logger.info("Create opehab template file")
+    def create_openhab_template(self, openhab_basedir="/etc/openhab"):
+        logger.info("Creating openhab template file")
+        if openhab_basedir.endswith("/"):
+            openhab_basedir = openhab_basedir[0:-1]
         template_things = """
         Bridge mqtt:broker:mosquitto [ host="{{broker}}", port={{port}}, secure=false ]
 {
     // Homes
     {% for my_home in homes -%}
-        Thing mqtt:topic:netatmo2mqtthome-{{my_home.id}} "netatmo2mqtt home {{my_home.id}}" {
+        Thing mqtt:topic:netatmo2mqtthome{{my_home.id}} "netatmo2mqtt home {{my_home.id}}" {
         Channels:
             Type string   : id "netatmo2mqtt {{my_home.name}} id" [ stateTopic="{{topic}}/{{my_home.id}}/state", transformationPattern="JSONPATH:.id"]
             Type string   : name "netatmo2mqtt {{my_home.name}} name" [ stateTopic="{{topic}}/{{my_home.id}}/state", transformationPattern="JSONPATH:.name"]
@@ -199,7 +202,7 @@ class MyNetatmo():
 
     // Rooms
     {%for room in rooms if room.home_id == my_home.id -%}
-        Thing mqtt:topic:netatmo2mqttroom-{{room.id}} "netatmo2mqtt room {{room.name}} home {{my_home.id}}" {
+        Thing mqtt:topic:netatmo2mqttroom{{room.id}} "netatmo2mqtt room {{room.name}} home {{my_home.id}}" {
         Channels:
             Type string         : id                          "netatmo2mqtt room {{room.name}} id"                            [ stateTopic="{{topic}}/{{room.id}}/state", transformationPattern="JSONPATH:.id"]
             Type string         : name                        "netatmo2mqtt room {{room.name}} name"                          [ stateTopic="{{topic}}/{{room.name}}/state", transformationPattern="JSONPATH:.name"]
@@ -217,7 +220,7 @@ class MyNetatmo():
 
     // Modules
     {%for module in modules if module.home_id == my_home.id  -%}
-        Thing mqtt:topic:netatmo2mqttmodule-{{my_home.id}} "netatmo2mqtt module {{module.name}} home {{my_home.id}}" {
+        Thing mqtt:topic:netatmo2mqttmodule{{my_home.id}} "netatmo2mqtt module {{module.name}} home {{my_home.id}}" {
         Channels:
             Type string     : id                        "netatmo2mqtt module {{module.name}} id"                                    [ stateTopic="{{topic}}/{{module.id}}/state", transformationPattern="JSONPATH:.id"]
             Type string     : type                      "netatmo2mqtt module {{module.name}} type"                                  [ stateTopic="{{topic}}/{{module.id}}/state", transformationPattern="JSONPATH:.type"]
@@ -248,10 +251,11 @@ class MyNetatmo():
         """
         template = Template(template_things)
         data_things = template.render(self.all_data)
-        things_file = opehhab_basedir + "/things/netatmo.things"
-        if os.path.exists(opehhab_basedir + "/things"):
+        things_file = openhab_basedir + "/things/netatmo.things"
+        if os.path.exists(openhab_basedir + "/things"):
             with open(things_file, "w") as my_file:
                 my_file.write(data_things)
+            logger.info(f"Created {things_file}")
         else:
             logger.error(f"openhab basedir {openhab_basedir}/things is not present ")
         return data_things
@@ -300,7 +304,7 @@ def main():
         netatmo_run = MyNetatmo(settings_file=settings_file)
         netatmo_run.get_netatmo_status()
         opehhab_basedir = flags.openhabtemplate
-        netatmo_run.create_openhab_template(opehhab_basedir="tmp/openhab")
+        netatmo_run.create_openhab_template(openhab_basedir=opehhab_basedir)
 
     if flags.daemon:
         logger.info("Launching daemon")
