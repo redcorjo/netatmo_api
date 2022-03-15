@@ -187,7 +187,7 @@ class MyNetatmo():
 {
     // Homes
     {% for my_home in homes -%}
-        Thing mqtt:topic:netatmo2mqtthome{{my_home.id}} "netatmo2mqtt home {{my_home.id}}" {
+        Thing mqtt:topic:netatmohome{{my_home.id}} "netatmo2mqtt home {{my_home.id}}" {
         Channels:
             Type string   : id "netatmo2mqtt {{my_home.name}} id" [ stateTopic="{{topic}}/{{my_home.id}}/state", transformationPattern="JSONPATH:.id"]
             Type string   : name "netatmo2mqtt {{my_home.name}} name" [ stateTopic="{{topic}}/{{my_home.id}}/state", transformationPattern="JSONPATH:.name"]
@@ -203,7 +203,7 @@ class MyNetatmo():
 
     // Rooms
     {%for room in rooms if room.home_id == my_home.id -%}
-        Thing mqtt:topic:netatmo2mqttroom{{room.id}} "netatmo2mqtt room {{room.name}} home {{my_home.id}}" {
+        Thing mqtt:topic:netatmoroom{{room.id}} "netatmo2mqtt room {{room.name}} home {{my_home.id}}" {
         Channels:
             Type string         : id                          "netatmo2mqtt room {{room.name}} id"                            [ stateTopic="{{topic}}/{{room.id}}/state", transformationPattern="JSONPATH:.id"]
             Type string         : name                        "netatmo2mqtt room {{room.name}} name"                          [ stateTopic="{{topic}}/{{room.name}}/state", transformationPattern="JSONPATH:.name"]
@@ -221,7 +221,7 @@ class MyNetatmo():
 
     // Modules
     {%for module in modules if module.home_id == my_home.id  -%}
-        Thing mqtt:topic:netatmo2mqttmodule{{module.label}} "netatmo2mqtt module {{module.name}} home {{my_home.id}}" {
+        Thing mqtt:topic:netatmomodule{{module.label}} "netatmo2mqtt module {{module.name}} home {{my_home.id}}" {
         Channels:
             Type string     : id                        "netatmo2mqtt module {{module.name}} id"                                    [ stateTopic="{{topic}}/{{module.id}}/state", transformationPattern="JSONPATH:.id"]
             Type string     : type                      "netatmo2mqtt module {{module.name}} type"                                  [ stateTopic="{{topic}}/{{module.id}}/state", transformationPattern="JSONPATH:.type"]
@@ -234,7 +234,7 @@ class MyNetatmo():
             {% endif %}
             {% if module.type == "NATherm1" %}
             Type switch     : boiler_valve_comfort_boost            "netatmo2mqtt module {{module.name}} boiler_valve_comfort_boost"                    [ stateTopic="{{topic}}/{{module.id}}/state", transformationPattern="JSONPATH:.boiler_valve_comfort_boost",on="true", off="false"]
-            {% endif %}
+            {% endif %} 
             {% if module.type != "NAPlug" %}
             Type string     : bridge                    "netatmo2mqtt module {{module.name}} bridge"                                [ stateTopic="{{topic}}/{{module.id}}/state", transformationPattern="JSONPATH:.bridge"]
             Type string     : battery_state             "netatmo2mqtt module {{module.name}} battery_state"                                [ stateTopic="{{topic}}/{{module.id}}/state", transformationPattern="JSONPATH:.battery_state"]
@@ -253,55 +253,111 @@ class MyNetatmo():
         template_items="""
     // Homes
     {% for my_home in homes -%}
-            String netatmo_home_{{my_home.id}}_id                               "netatmo2mqtt {{my_home.name}} id"                              { channel="mqtt:topic:netatmo:netatmo2mqtthome{{my_home.id}}:id"}
-            String netatmo_home_{{my_home.id}}_name                             "netatmo2mqtt {{my_home.name}} name"                            { channel="mqtt:topic:netatmo:netatmo2mqtthome{{my_home.id}}:name"}
-            Number netatmo_home_{{my_home.id}}_altitude                         "netatmo2mqtt {{my_home.name}} altitude"                        { channel="mqtt:topic:netatmo:netatmo2mqtthome{{my_home.id}}:altitude"}
-            Location netatmo_home_{{my_home.id}}_coordinates                    "netatmo2mqtt {{my_home.name}} coordinates [%2$s°N %3$s°E]"                     { channel="mqtt:topic:netatmo:netatmo2mqtthome{{my_home.id}}:coordinates"}
-            String netatmo_home_{{my_home.id}}_country                          "netatmo2mqtt {{my_home.name}} country"                         { channel="mqtt:topic:netatmo:netatmo2mqtthome{{my_home.id}}:country"}
-            String netatmo_home_{{my_home.id}}_timezone                         "netatmo2mqtt {{my_home.name}} timezone"                        { channel="mqtt:topic:netatmo:netatmo2mqtthome{{my_home.id}}:timezone"}
-            String netatmo_home_{{my_home.id}}_temperature_control_mode         "netatmo2mqtt {{my_home.name}} temperature_control_mode"        { channel="mqtt:topic:netatmo:netatmo2mqtthome{{my_home.id}}:temperature_control_mode"}
-            String netatmo_home_{{my_home.id}}_therm_mode                       "netatmo2mqtt {{my_home.name}} therm_mode"                      { channel="mqtt:topic:netatmo:netatmo2mqtthome{{my_home.id}}:therm_mode"}
-            Number netatmo_home_{{my_home.id}}_therm_setpoint_default_duration  "netatmo2mqtt {{my_home.name}} therm_setpoint_default_duration" { channel="mqtt:topic:netatmo:netatmo2mqtthome{{my_home.id}}:therm_setpoint_default_duration"}
-            String netatmo_home_{{my_home.id}}_cooling_mode                     "netatmo2mqtt {{my_home.name}} cooling_mode"                    { channel="mqtt:topic:netatmo:netatmo2mqtthome{{my_home.id}}:cooling_mode"}
+            String netatmo_home_{{my_home.id}}_id                               "netatmo2mqtt {{my_home.name}} id"                              { channel="mqtt:topic:netatmohome{{my_home.id}}:id"}
+            String netatmo_home_{{my_home.id}}_name                             "netatmo2mqtt {{my_home.name}} name"                            { channel="mqtt:topic:netatmohome{{my_home.id}}:name"}
+            Number netatmo_home_{{my_home.id}}_altitude                         "netatmo2mqtt {{my_home.name}} altitude"                        { channel="mqtt:topic:netatmohome{{my_home.id}}:altitude"}
+            Location netatmo_home_{{my_home.id}}_coordinates                    "netatmo2mqtt {{my_home.name}} coordinates [%2$s°N %3$s°E]"     { channel="mqtt:topic:netatmohome{{my_home.id}}:coordinates"}
+            String netatmo_home_{{my_home.id}}_country                          "netatmo2mqtt {{my_home.name}} country"                         { channel="mqtt:topic:netatmohome{{my_home.id}}:country"}
+            String netatmo_home_{{my_home.id}}_timezone                         "netatmo2mqtt {{my_home.name}} timezone"                        { channel="mqtt:topic:netatmohome{{my_home.id}}:timezone"}
+            String netatmo_home_{{my_home.id}}_temperature_control_mode         "netatmo2mqtt {{my_home.name}} temperature_control_mode"        { channel="mqtt:topic:netatmohome{{my_home.id}}:temperature_control_mode"}
+            String netatmo_home_{{my_home.id}}_therm_mode                       "netatmo2mqtt {{my_home.name}} therm_mode"                      { channel="mqtt:topic:netatmohome{{my_home.id}}:therm_mode"}
+            Number netatmo_home_{{my_home.id}}_therm_setpoint_default_duration  "netatmo2mqtt {{my_home.name}} therm_setpoint_default_duration" { channel="mqtt:topic:netatmohome{{my_home.id}}:therm_setpoint_default_duration"}
+            String netatmo_home_{{my_home.id}}_cooling_mode                     "netatmo2mqtt {{my_home.name}} cooling_mode"                    { channel="mqtt:topic:netatmohome{{my_home.id}}:cooling_mode"}
 
     // Rooms
     {%for room in rooms if room.home_id == my_home.id -%}
-            String netatmo_room_{{room.id}}_id                          "netatmo2mqtt room {{room.name}} id"                                               { channel="mqtt:topic:netatmo:netatmo2mqttroom{{room.id}}:id"}
-            String netatmo_room_{{room.id}}_name                        "netatmo2mqtt room {{room.name}} name"                                             { channel="mqtt:topic:netatmo:netatmo2mqttroom{{room.id}}:name"}
-            String netatmo_room_{{room.id}}_type                        "netatmo2mqtt room {{room.name}} type"                                             { channel="mqtt:topic:netatmo:netatmo2mqttroom{{room.id}}:type"}
-            Switch netatmo_room_{{room.id}}_reachable                   "netatmo2mqtt room {{room.name}} reachable"                                        { channel="mqtt:topic:netatmo:netatmo2mqttroom{{room.id}}:reachable"}
-            Switch netatmo_room_{{room.id}}_anticipating                "netatmo2mqtt room {{room.name}} anticipating"                                     { channel="mqtt:topic:netatmo:netatmo2mqttroom{{room.id}}:anticipating"}
-            Number netatmo_room_{{room.id}}_heating_power_request       "netatmo2mqtt room {{room.name}} heating_power_request"                            { channel="mqtt:topic:netatmo:netatmo2mqttroom{{room.id}}:heating_power_request"}
-            Switch netatmo_room_{{room.id}}_open_window                 "netatmo2mqtt room {{room.name}} open_window"  <contact>                           { channel="mqtt:topic:netatmo:netatmo2mqttroom{{room.id}}:open_window"}
-            Number netatmo_room_{{room.id}}_therm_measured_temperature  "netatmo2mqtt room {{room.name}} therm_measured_temperature [%.2f °C]" <temp>      { channel="mqtt:topic:netatmo:netatmo2mqttroom{{room.id}}:therm_measured_temperature"}
-            Number netatmo_room_{{room.id}}_therm_setpoint_temperature  "netatmo2mqtt room {{room.name}} therm_setpoint_temperature [%.2f °C]" <temp>      { channel="mqtt:topic:netatmo:netatmo2mqttroom{{room.id}}:therm_setpoint_temperature"}
-            String netatmo_room_{{room.id}}_therm_setpoint_mode         "netatmo2mqtt room {{room.name}} therm_setpoint_mode"                              { channel="mqtt:topic:netatmo:netatmo2mqttroom{{room.id}}:therm_setpoint_mode"}
-            String netatmo_room_{{room.id}}_home_id                     "netatmo2mqtt room {{room.name}} home_id"                                          { channel="mqtt:topic:netatmo:netatmo2mqttroom{{room.id}}:home_id"}
+            String netatmo_room_{{room.id}}_id                          "netatmo2mqtt room {{room.name}} id"                                               { channel="mqtt:topic:netatmoroom{{room.id}}:id"}
+            String netatmo_room_{{room.id}}_name                        "netatmo2mqtt room {{room.name}} name"                                             { channel="mqtt:topic:netatmoroom{{room.id}}:name"}
+            String netatmo_room_{{room.id}}_type                        "netatmo2mqtt room {{room.name}} type"                                             { channel="mqtt:topic:netatmoroom{{room.id}}:type"}
+            Switch netatmo_room_{{room.id}}_reachable                   "netatmo2mqtt room {{room.name}} reachable"                                        { channel="mqtt:topic:netatmoroom{{room.id}}:reachable"}
+            Switch netatmo_room_{{room.id}}_anticipating                "netatmo2mqtt room {{room.name}} anticipating"                                     { channel="mqtt:topic:netatmoroom{{room.id}}:anticipating"}
+            Number netatmo_room_{{room.id}}_heating_power_request       "netatmo2mqtt room {{room.name}} heating_power_request"                            { channel="mqtt:topic:netatmoroom{{room.id}}:heating_power_request"}
+            Switch netatmo_room_{{room.id}}_open_window                 "netatmo2mqtt room {{room.name}} open_window"  <contact>                           { channel="mqtt:topic:netatmoroom{{room.id}}:open_window"}
+            Number netatmo_room_{{room.id}}_therm_measured_temperature  "netatmo2mqtt room {{room.name}} therm_measured_temperature [%.2f °C]" <temp>      { channel="mqtt:topic:netatmoroom{{room.id}}:therm_measured_temperature"}
+            Number netatmo_room_{{room.id}}_therm_setpoint_temperature  "netatmo2mqtt room {{room.name}} therm_setpoint_temperature [%.2f °C]" <temp>      { channel="mqtt:topic:netatmoroom{{room.id}}:therm_setpoint_temperature"}
+            String netatmo_room_{{room.id}}_therm_setpoint_mode         "netatmo2mqtt room {{room.name}} therm_setpoint_mode"                              { channel="mqtt:topic:netatmoroom{{room.id}}:therm_setpoint_mode"}
+            String netatmo_room_{{room.id}}_home_id                     "netatmo2mqtt room {{room.name}} home_id"                                          { channel="mqtt:topic:netatmoroom{{room.id}}:home_id"}
     {% endfor %}
 
     // Modules
     {%for module in modules if module.home_id == my_home.id  -%}
-            String netatmo_module_{{module.label}}_id                        "netatmo2mqtt module {{module.name}} id"                                           { channel="mqtt:topic:netatmo:netatmo2mqttmodule{{module.label}}:id"}
-            String netatmo_module_{{module.label}}_type                      "netatmo2mqtt module {{module.name}} type"                                         { channel="mqtt:topic:netatmo:netatmo2mqttmodule{{module.label}}:type"}
-            String netatmo_module_{{module.label}}_name                      "netatmo2mqtt module {{module.name}} name"            <radiator>                   { channel="mqtt:topic:netatmo:netatmo2mqttmodule{{module.label}}:name"}
-            Number netatmo_module_{{module.label}}_setup_date                "netatmo2mqtt module {{module.name}} setup_date"                                   { channel="mqtt:topic:netatmo:netatmo2mqttmodule{{module.label}}:setup_date"}
-            String netatmo_module_{{module.label}}_home_id                   "netatmo2mqtt module {{module.name}} home_id"                                      { channel="mqtt:topic:netatmo:netatmo2mqttmodule{{module.label}}:home_id"}
+            String netatmo_module_{{module.label}}_id                        "netatmo2mqtt module {{module.name}} id"                                           { channel="mqtt:topic:netatmomodule{{module.label}}:id"}
+            String netatmo_module_{{module.label}}_type                      "netatmo2mqtt module {{module.name}} type"                                         { channel="mqtt:topic:netatmomodule{{module.label}}:type"}
+            String netatmo_module_{{module.label}}_name                      "netatmo2mqtt module {{module.name}} name"            <radiator>                   { channel="mqtt:topic:netatmomodule{{module.label}}:name"}
+            Number netatmo_module_{{module.label}}_setup_date                "netatmo2mqtt module {{module.name}} setup_date"                                   { channel="mqtt:topic:netatmomodule{{module.label}}:setup_date"}
+            String netatmo_module_{{module.label}}_home_id                   "netatmo2mqtt module {{module.name}} home_id"                                      { channel="mqtt:topic:netatmomodule{{module.label}}:home_id"}
             {% if module.type == "NAPlug" %}
-            //netatmo_module_{{module.label}}_setup_date                "netatmo2mqtt module {{module.name}} setup_date"                                   { channel="mqtt:topic:netatmo:netatmo2mqttmodule{{module.label}}:setup_date"}
-            Number netatmo_module_{{module.label}}_wifi_strength             "netatmo2mqtt module {{module.name}} wifi_strength"                                { channel="mqtt:topic:netatmo:netatmo2mqttmodule{{module.label}}:wifi_strength"}
+            //netatmo_module_{{module.label}}_setup_date                "netatmo2mqtt module {{module.name}} setup_date"                                        { channel="mqtt:topic:netatmomodule{{module.label}}:setup_date"}
+            Number netatmo_module_{{module.label}}_wifi_strength             "netatmo2mqtt module {{module.name}} wifi_strength"                                { channel="mqtt:topic:netatmomodule{{module.label}}:wifi_strength"}
             {% endif %}
             {% if module.type == "NATherm1" %}
-            Switch netatmo_module_{{module.label}}_boiler_valve_comfort_boost "netatmo2mqtt module {{module.name}} boiler_valve_comfort_boost"                  { channel="mqtt:topic:netatmo:netatmo2mqttmodule{{module.label}}:boiler_valve_comfort_boost"}
+            Switch netatmo_module_{{module.label}}_boiler_valve_comfort_boost "netatmo2mqtt module {{module.name}} boiler_valve_comfort_boost"                  { channel="mqtt:topic:netatmomodule{{module.label}}:boiler_valve_comfort_boost"}
             {% endif %}
             {% if module.type != "NAPlug" %}
-            String netatmo_module_{{module.label}}_bridge                    "netatmo2mqtt module {{module.name}} bridge"                                       { channel="mqtt:topic:netatmo:netatmo2mqttmodule{{module.label}}:bridge"}
-            String netatmo_module_{{module.label}}_battery_state             "netatmo2mqtt module {{module.name}} battery_state"    <battery>                   { channel="mqtt:topic:netatmo:netatmo2mqttmodule{{module.label}}:battery_state"}
-            Number netatmo_module_{{module.label}}_battery_level             "netatmo2mqtt module {{module.name}} battery_level"    <batterylevel>              { channel="mqtt:topic:netatmo:netatmo2mqttmodule{{module.label}}:battery_level"}
-            String netatmo_module_{{module.label}}_firmware_revision         "netatmo2mqtt module {{module.name}} firmware_revision"                            { channel="mqtt:topic:netatmo:netatmo2mqttmodule{{module.label}}:firmware_revision"}
-            Number netatmo_module_{{module.label}}_rf_strength               "netatmo2mqtt module {{module.name}} rf_strength"     <network>                    { channel="mqtt:topic:netatmo:netatmo2mqttmodule{{module.label}}:rf_strength"}
-            Switch netatmo_module_{{module.label}}_reachable                 "netatmo2mqtt module {{module.name}} reachable"                                    { channel="mqtt:topic:netatmo:netatmo2mqttmodule{{module.label}}:reachable"}
-            Switch netatmo_module_{{module.label}}_boiler_status             "netatmo2mqtt module {{module.name}} boiler_status"   <heating>                    { channel="mqtt:topic:netatmo:netatmo2mqttmodule{{module.label}}:boiler_status"}
-            Number netatmo_module_{{module.label}}_room_id                   "netatmo2mqtt module {{module.name}} room_id"                                      { channel="mqtt:topic:netatmo:netatmo2mqttmodule{{module.label}}:room_id"}
+            String netatmo_module_{{module.label}}_bridge                    "netatmo2mqtt module {{module.name}} bridge"                                       { channel="mqtt:topic:netatmomodule{{module.label}}:bridge"}
+            String netatmo_module_{{module.label}}_battery_state             "netatmo2mqtt module {{module.name}} battery_state"    <battery>                   { channel="mqtt:topic:netatmomodule{{module.label}}:battery_state"}
+            Number netatmo_module_{{module.label}}_battery_level             "netatmo2mqtt module {{module.name}} battery_level"    <batterylevel>              { channel="mqtt:topic:netatmomodule{{module.label}}:battery_level"}
+            String netatmo_module_{{module.label}}_firmware_revision         "netatmo2mqtt module {{module.name}} firmware_revision"                            { channel="mqtt:topic:netatmomodule{{module.label}}:firmware_revision"}
+            Number netatmo_module_{{module.label}}_rf_strength               "netatmo2mqtt module {{module.name}} rf_strength"     <network>                    { channel="mqtt:topic:netatmomodule{{module.label}}:rf_strength"}
+            Switch netatmo_module_{{module.label}}_reachable                 "netatmo2mqtt module {{module.name}} reachable"                                    { channel="mqtt:topic:netatmomodule{{module.label}}:reachable"}
+            Switch netatmo_module_{{module.label}}_boiler_status             "netatmo2mqtt module {{module.name}} boiler_status"   <heating>                    { channel="mqtt:topic:netatmomodule{{module.label}}:boiler_status"}
+            Number netatmo_module_{{module.label}}_room_id                   "netatmo2mqtt module {{module.name}} room_id"                                      { channel="mqtt:topic:netatmomodule{{module.label}}:room_id"}
+            {% endif %}
+    {% endfor %}
+    {% endfor %}
+        """
+        template_sitemaps="""
+    // Homes
+    {% for my_home in homes -%}
+            String netatmo_home_{{my_home.id}}_id                               "netatmo2mqtt {{my_home.name}} id"                              { channel="mqtt:topic:netatmohome{{my_home.id}}:id"}
+            String netatmo_home_{{my_home.id}}_name                             "netatmo2mqtt {{my_home.name}} name"                            { channel="mqtt:topic:netatmohome{{my_home.id}}:name"}
+            Number netatmo_home_{{my_home.id}}_altitude                         "netatmo2mqtt {{my_home.name}} altitude"                        { channel="mqtt:topic:netatmohome{{my_home.id}}:altitude"}
+            Location netatmo_home_{{my_home.id}}_coordinates                    "netatmo2mqtt {{my_home.name}} coordinates [%2$s°N %3$s°E]"     { channel="mqtt:topic:netatmohome{{my_home.id}}:coordinates"}
+            String netatmo_home_{{my_home.id}}_country                          "netatmo2mqtt {{my_home.name}} country"                         { channel="mqtt:topic:netatmohome{{my_home.id}}:country"}
+            String netatmo_home_{{my_home.id}}_timezone                         "netatmo2mqtt {{my_home.name}} timezone"                        { channel="mqtt:topic:netatmohome{{my_home.id}}:timezone"}
+            String netatmo_home_{{my_home.id}}_temperature_control_mode         "netatmo2mqtt {{my_home.name}} temperature_control_mode"        { channel="mqtt:topic:netatmohome{{my_home.id}}:temperature_control_mode"}
+            String netatmo_home_{{my_home.id}}_therm_mode                       "netatmo2mqtt {{my_home.name}} therm_mode"                      { channel="mqtt:topic:netatmohome{{my_home.id}}:therm_mode"}
+            Number netatmo_home_{{my_home.id}}_therm_setpoint_default_duration  "netatmo2mqtt {{my_home.name}} therm_setpoint_default_duration" { channel="mqtt:topic:netatmohome{{my_home.id}}:therm_setpoint_default_duration"}
+            String netatmo_home_{{my_home.id}}_cooling_mode                     "netatmo2mqtt {{my_home.name}} cooling_mode"                    { channel="mqtt:topic:netatmohome{{my_home.id}}:cooling_mode"}
+
+    // Rooms
+    {%for room in rooms if room.home_id == my_home.id -%}
+            String netatmo_room_{{room.id}}_id                          "netatmo2mqtt room {{room.name}} id"                                               { channel="mqtt:topic:netatmoroom{{room.id}}:id"}
+            String netatmo_room_{{room.id}}_name                        "netatmo2mqtt room {{room.name}} name"                                             { channel="mqtt:topic:netatmoroom{{room.id}}:name"}
+            String netatmo_room_{{room.id}}_type                        "netatmo2mqtt room {{room.name}} type"                                             { channel="mqtt:topic:netatmoroom{{room.id}}:type"}
+            Switch netatmo_room_{{room.id}}_reachable                   "netatmo2mqtt room {{room.name}} reachable"                                        { channel="mqtt:topic:netatmoroom{{room.id}}:reachable"}
+            Switch netatmo_room_{{room.id}}_anticipating                "netatmo2mqtt room {{room.name}} anticipating"                                     { channel="mqtt:topic:netatmoroom{{room.id}}:anticipating"}
+            Number netatmo_room_{{room.id}}_heating_power_request       "netatmo2mqtt room {{room.name}} heating_power_request"                            { channel="mqtt:topic:netatmoroom{{room.id}}:heating_power_request"}
+            Switch netatmo_room_{{room.id}}_open_window                 "netatmo2mqtt room {{room.name}} open_window"  <contact>                           { channel="mqtt:topic:netatmoroom{{room.id}}:open_window"}
+            Number netatmo_room_{{room.id}}_therm_measured_temperature  "netatmo2mqtt room {{room.name}} therm_measured_temperature [%.2f °C]" <temp>      { channel="mqtt:topic:netatmoroom{{room.id}}:therm_measured_temperature"}
+            Number netatmo_room_{{room.id}}_therm_setpoint_temperature  "netatmo2mqtt room {{room.name}} therm_setpoint_temperature [%.2f °C]" <temp>      { channel="mqtt:topic:netatmoroom{{room.id}}:therm_setpoint_temperature"}
+            String netatmo_room_{{room.id}}_therm_setpoint_mode         "netatmo2mqtt room {{room.name}} therm_setpoint_mode"                              { channel="mqtt:topic:netatmoroom{{room.id}}:therm_setpoint_mode"}
+            String netatmo_room_{{room.id}}_home_id                     "netatmo2mqtt room {{room.name}} home_id"                                          { channel="mqtt:topic:netatmoroom{{room.id}}:home_id"}
+    {% endfor %}
+
+    // Modules
+    {%for module in modules if module.home_id == my_home.id  -%}
+            String netatmo_module_{{module.label}}_id                        "netatmo2mqtt module {{module.name}} id"                                           { channel="mqtt:topic:netatmomodule{{module.label}}:id"}
+            String netatmo_module_{{module.label}}_type                      "netatmo2mqtt module {{module.name}} type"                                         { channel="mqtt:topic:netatmomodule{{module.label}}:type"}
+            String netatmo_module_{{module.label}}_name                      "netatmo2mqtt module {{module.name}} name"            <radiator>                   { channel="mqtt:topic:netatmomodule{{module.label}}:name"}
+            Number netatmo_module_{{module.label}}_setup_date                "netatmo2mqtt module {{module.name}} setup_date"                                   { channel="mqtt:topic:netatmomodule{{module.label}}:setup_date"}
+            String netatmo_module_{{module.label}}_home_id                   "netatmo2mqtt module {{module.name}} home_id"                                      { channel="mqtt:topic:netatmomodule{{module.label}}:home_id"}
+            {% if module.type == "NAPlug" %}
+            //netatmo_module_{{module.label}}_setup_date                "netatmo2mqtt module {{module.name}} setup_date"                                        { channel="mqtt:topic:netatmomodule{{module.label}}:setup_date"}
+            Number netatmo_module_{{module.label}}_wifi_strength             "netatmo2mqtt module {{module.name}} wifi_strength"                                { channel="mqtt:topic:netatmomodule{{module.label}}:wifi_strength"}
+            {% endif %}
+            {% if module.type == "NATherm1" %}
+            Switch netatmo_module_{{module.label}}_boiler_valve_comfort_boost "netatmo2mqtt module {{module.name}} boiler_valve_comfort_boost"                  { channel="mqtt:topic:netatmomodule{{module.label}}:boiler_valve_comfort_boost"}
+            {% endif %}
+            {% if module.type != "NAPlug" %}
+            String netatmo_module_{{module.label}}_bridge                    "netatmo2mqtt module {{module.name}} bridge"                                       { channel="mqtt:topic:netatmomodule{{module.label}}:bridge"}
+            String netatmo_module_{{module.label}}_battery_state             "netatmo2mqtt module {{module.name}} battery_state"    <battery>                   { channel="mqtt:topic:netatmomodule{{module.label}}:battery_state"}
+            Number netatmo_module_{{module.label}}_battery_level             "netatmo2mqtt module {{module.name}} battery_level"    <batterylevel>              { channel="mqtt:topic:netatmomodule{{module.label}}:battery_level"}
+            String netatmo_module_{{module.label}}_firmware_revision         "netatmo2mqtt module {{module.name}} firmware_revision"                            { channel="mqtt:topic:netatmomodule{{module.label}}:firmware_revision"}
+            Number netatmo_module_{{module.label}}_rf_strength               "netatmo2mqtt module {{module.name}} rf_strength"     <network>                    { channel="mqtt:topic:netatmomodule{{module.label}}:rf_strength"}
+            Switch netatmo_module_{{module.label}}_reachable                 "netatmo2mqtt module {{module.name}} reachable"                                    { channel="mqtt:topic:netatmomodule{{module.label}}:reachable"}
+            Switch netatmo_module_{{module.label}}_boiler_status             "netatmo2mqtt module {{module.name}} boiler_status"   <heating>                    { channel="mqtt:topic:netatmomodule{{module.label}}:boiler_status"}
+            Number netatmo_module_{{module.label}}_room_id                   "netatmo2mqtt module {{module.name}} room_id"                                      { channel="mqtt:topic:netatmomodule{{module.label}}:room_id"}
             {% endif %}
     {% endfor %}
     {% endfor %}
