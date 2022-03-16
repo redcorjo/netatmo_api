@@ -114,7 +114,7 @@ class MyNetatmo():
         return config
 
     def background_daemon(self):
-        topic = f"{self.topic}/#"
+        topic = f"{self.topic}/+/+/command"
         self.mqtt.subscribe_topic(topic=topic)
 
     def schedule_daemon(self):

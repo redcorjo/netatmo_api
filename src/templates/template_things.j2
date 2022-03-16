@@ -11,7 +11,7 @@
         Type string   : country "netatmo2mqtt {{my_home.name}} country" [ stateTopic="{{topic}}/{{my_home.id}}/state", transformationPattern="JSONPATH:.country"]
         Type string   : timezone "netatmo2mqtt {{my_home.name}} timezone" [ stateTopic="{{topic}}/{{my_home.id}}/state", transformationPattern="JSONPATH:.timezone"]
         Type string   : temperature_control_mode "netatmo2mqtt {{my_home.name}} temperature_control_mode" [ stateTopic="{{topic}}/{{my_home.id}}/state", transformationPattern="JSONPATH:.temperature_control_mode"]
-        Type string   : therm_mode "netatmo2mqtt {{my_home.name}} therm_mode" [ stateTopic="{{topic}}/{{my_home.id}}/state", transformationPattern="JSONPATH:.therm_mode"]
+        Type string   : therm_mode "netatmo2mqtt {{my_home.name}} therm_mode" [ stateTopic="{{topic}}/{{my_home.id}}/state", commandTopic="{{topic}}/{{my_home.id}}/therm_mode/command", transformationPattern="JSONPATH:.therm_mode"]
         Type string   : therm_setpoint_default_duration "netatmo2mqtt {{my_home.name}} therm_setpoint_default_duration" [ stateTopic="{{topic}}/{{my_home.id}}/state", transformationPattern="JSONPATH:.therm_setpoint_default_duration"]
         Type string   : cooling_mode "netatmo2mqtt {{my_home.name}} cooling_mode" [ stateTopic="{{topic}}/{{my_home.id}}/state", commandTopic="{{topic}}/{{my_home.id}}/cooling_mode/command", transformationPattern="JSONPATH:.cooling_mode" ]
     }

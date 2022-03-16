@@ -13,7 +13,7 @@ Frame {
             Default item=netatmo_home_{{my_home.id}}_country                          label="{{my_home.name}} country"                        
             Default item=netatmo_home_{{my_home.id}}_timezone                         label="{{my_home.name}} timezone"                       
             Default item=netatmo_home_{{my_home.id}}_temperature_control_mode         label="{{my_home.name}} temperature_control_mode"       
-            Default item=netatmo_home_{{my_home.id}}_therm_mode                       label="{{my_home.name}} therm_mode"                     
+            Selection item=netatmo_home_{{my_home.id}}_therm_mode                       label="{{my_home.name}} therm_mode [%s]"                       mappings=["schedule"="schedule", "away"="away"]                  
             Default item=netatmo_home_{{my_home.id}}_therm_setpoint_default_duration  label="{{my_home.name}} therm_setpoint_default_duration"
             Default item=netatmo_home_{{my_home.id}}_cooling_mode                     label="{{my_home.name}} cooling_mode"                   
         }
@@ -35,8 +35,8 @@ Frame {
             Default item=netatmo_room_{{room.id}}_heating_power_request       label="{{room.name}} heating_power_request"                            
             Default item=netatmo_room_{{room.id}}_open_window                 label="{{room.name}} open_window"                            
             Default item=netatmo_room_{{room.id}}_therm_measured_temperature  label="{{room.name}} therm_measured_temperature [%.2f °C]" 
-            Default item=netatmo_room_{{room.id}}_therm_setpoint_temperature  label="{{room.name}} therm_setpoint_temperature [%.2f °C]"       
-            Selection item=netatmo_room_{{room.id}}_therm_setpoint_mode         label="{{room.name}} therm_setpoint_mode"   mappings=["schedule"="schedule", "away"="away"]                           
+            Setpoint item=netatmo_room_{{room.id}}_therm_setpoint_temperature  label="{{room.name}} therm_setpoint_temperature [%.2f °C]"    minValue=17 maxValue=27 step=0.5   
+            Selection item=netatmo_room_{{room.id}}_therm_setpoint_mode         label="{{room.name}} therm_setpoint_mode [%s]"   mappings=["schedule"="schedule", "away"="away"]                           
             Default item=netatmo_room_{{room.id}}_home_id                     label="{{room.name}} home_id"                                          
         }
     }
