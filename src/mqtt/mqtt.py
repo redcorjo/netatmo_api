@@ -54,6 +54,7 @@ class MQTT():
             self.__connect_queue()
         if topic == None:
             topic = f"{self.topic}/+/update" 
+        logger.info(f"Subscribing to mqtt topic {topic}")
         self.client.subscribe(topic, qos=0)
         self.client.on_message=self.mqtt_on_message
         self.client.loop_forever()
