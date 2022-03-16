@@ -115,7 +115,7 @@ class MyNetatmo():
 
     def background_daemon(self):
         topic = f"{self.topic}/+/+/command"
-        self.mqtt.subscribe_topic(topic=topic)
+        self.mqtt.subscribe_topic(topic=topic, on_message=self.mqtt_on_message)
 
     def schedule_daemon(self):
         if self.scheduler == None:
@@ -124,6 +124,13 @@ class MyNetatmo():
         self.scheduler.add_job(self.get_netatmo_status, "interval", minutes=self.frequency, next_run_time=datetime.datetime.now())
         self.scheduler.start()
         self.background_daemon()
+
+    def mqtt_on_message(self, client, userdata, message):
+        if not message.topic.endswith("/state"):
+            logger.info(f"message received {message.payload}")
+            logger.info(f"message topic={message.topic}")
+            logger.info(f"message qos={message.qos}")
+            logger.info(f"message retain flag={message.retain}")
 
     def scheduler_status(self):
         return self.scheduler.running

@@ -49,14 +49,17 @@ class MQTT():
             logger.info(f"message qos={message.qos}")
             logger.info(f"message retain flag={message.retain}")
 
-    def subscribe_topic(self, topic=None, qos=0):
+    def subscribe_topic(self, topic=None, qos=0, on_message=None):
         if self.client == None:
             self.__connect_queue()
         if topic == None:
             topic = f"{self.topic}/+/update" 
         logger.info(f"Subscribing to mqtt topic {topic}")
         self.client.subscribe(topic, qos=0)
-        self.client.on_message=self.mqtt_on_message
+        if on_message == None:
+            self.client.on_message=self.mqtt_on_message
+        else:
+            self.client.on_message=on_message
         self.client.loop_forever()
 
     def __connect_queue(self):
