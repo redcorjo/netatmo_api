@@ -24,8 +24,8 @@ Switch netatmo_room_{{room.id}}_reachable                   "netatmo2mqtt room {
 Switch netatmo_room_{{room.id}}_anticipating                "netatmo2mqtt room {{room.name}} anticipating"                                     { channel="mqtt:topic:netatmoroom{{room.id}}:anticipating"}
 Number netatmo_room_{{room.id}}_heating_power_request       "netatmo2mqtt room {{room.name}} heating_power_request"                            { channel="mqtt:topic:netatmoroom{{room.id}}:heating_power_request"}
 Switch netatmo_room_{{room.id}}_open_window                 "netatmo2mqtt room {{room.name}} open_window"  <contact>                           { channel="mqtt:topic:netatmoroom{{room.id}}:open_window"}
-Number netatmo_room_{{room.id}}_therm_measured_temperature  "netatmo2mqtt room {{room.name}} therm_measured_temperature [%.2f °C]" <temp>      { channel="mqtt:topic:netatmoroom{{room.id}}:therm_measured_temperature"}
-Number netatmo_room_{{room.id}}_therm_setpoint_temperature  "netatmo2mqtt room {{room.name}} therm_setpoint_temperature [%.2f °C]" <temp>      { channel="mqtt:topic:netatmoroom{{room.id}}:therm_setpoint_temperature"}
+Number netatmo_room_{{room.id}}_therm_measured_temperature  "netatmo2mqtt room {{room.name}} therm_measured_temperature [%.2f °C]" <temperature>      { channel="mqtt:topic:netatmoroom{{room.id}}:therm_measured_temperature"}
+Number netatmo_room_{{room.id}}_therm_setpoint_temperature  "netatmo2mqtt room {{room.name}} therm_setpoint_temperature [%.2f °C]" <temperature>      { channel="mqtt:topic:netatmoroom{{room.id}}:therm_setpoint_temperature"}
 String netatmo_room_{{room.id}}_therm_setpoint_mode         "netatmo2mqtt room {{room.name}} therm_setpoint_mode"                              { channel="mqtt:topic:netatmoroom{{room.id}}:therm_setpoint_mode"}
 String netatmo_room_{{room.id}}_home_id                     "netatmo2mqtt room {{room.name}} home_id"                                          { channel="mqtt:topic:netatmoroom{{room.id}}:home_id"}
 
