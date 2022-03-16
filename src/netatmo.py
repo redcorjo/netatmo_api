@@ -127,10 +127,12 @@ class MyNetatmo():
 
     def mqtt_on_message(self, client, userdata, message):
         if not message.topic.endswith("/state"):
-            logger.info(f"message received {message.payload}")
-            logger.info(f"message topic={message.topic}")
-            logger.info(f"message qos={message.qos}")
-            logger.info(f"message retain flag={message.retain}")
+            item = message.topic.split("/")[1]
+            topic = message.topic.split("/")[2]
+            value = message.payload.decode()
+            logger.info(f"message received {message.payload} value={value} fulltopic={message.topic} qos={message.qos} flag={message.retain} item={item} topic={topic}")
+            if topic == "therm_mode":
+                self.setthermmode(mode=value)
 
     def scheduler_status(self):
         return self.scheduler.running
