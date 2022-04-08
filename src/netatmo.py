@@ -13,6 +13,7 @@ from apscheduler.schedulers.background import BackgroundScheduler
 from jinja2 import Template
 from netatmo_api import Netatmo_API
 from mqtt import MQTT
+from web import launch_fastapp
 
 # logging.basicConfig(format='%(levelname)-8s [%(filename)s:%(lineno)d] - %(message)s',
 #     datefmt='%Y-%m-%d:%H:%M:%S',
@@ -31,6 +32,8 @@ class MyNetatmo():
             "rooms": [],
             "modules": []
         }
+    http_port = 8000
+    http_host = "0.0.0.0"
 
     def __init__(self, settings_file: str = None):
         if settings_file == None:
@@ -79,6 +82,13 @@ class MyNetatmo():
         # Settings scheduler
         self.frequency = int(config["global"]["frequency"])
 
+        # Settings web server
+        if "http" in config:
+            if "port" in config["http"]:
+                self.http_port = int(config["http"]["port"])
+            if "host" in config["http"]:
+                self.http_host = int(config["http"]["host"])
+
     def get_settings_file(self, settings_file: str = None):
         if settings_file == None:
             settings_file = self.settings_file
@@ -106,6 +116,9 @@ class MyNetatmo():
             config["mqtt"]["port"] = "1883"
             config["global"] = {}
             config["global"]["frequency"] = "5"
+            config["http"] = {}
+            config["http"]["port"] = "5"
+            config["http"]["host"] = "0.0.0.0"
             config["logging"] = {}
             config["logging"]["severity"] = "INFO"
             config["logging"]["filename"] = "netatmo.log"
@@ -117,11 +130,23 @@ class MyNetatmo():
         topic = f"{self.topic}/+/+/command"
         self.mqtt.subscribe_topic(topic=topic, on_message=self.mqtt_on_message)
 
-    def schedule_daemon(self):
+    def schedule_daemon(self, webserver=False):
         if self.scheduler == None:
             self.scheduler = BackgroundScheduler()
         logger.info(f"Schedule daemon with frequency={self.frequency}")
         self.scheduler.add_job(self.get_netatmo_status, "interval", minutes=self.frequency, next_run_time=datetime.datetime.now())
+        if webserver == True:
+            logger.info(f"Launch Web server at http://{self.http_host}:{self.http_port}")
+            web_config = {
+                "config": self.config,
+                "instance": self
+            }
+            web_params = {
+                "host": self.http_host,
+                "port": self.http_port,
+                "settings": web_config
+            }
+            self.scheduler.add_job(launch_fastapp, kwargs=web_params)
         self.scheduler.start()
         self.background_daemon()
 
@@ -261,6 +286,7 @@ def get_flags():
     parser.add_argument("-c", "--configfile", type=str, help="init config file")
     parser.add_argument("-st", "--setthermmode", type=str, help="setthermmode away or schedule possible values")
     parser.add_argument("-d", "--daemon", help="daemon", action="store_true")
+    parser.add_argument("-web", "--webserver", help="web server", action="store_true")
     parser.add_argument("-oh", "--openhabtemplate", type=str, help="Create openhab template")
     try:
         settings = parser.parse_args()
@@ -302,11 +328,16 @@ def main():
         opehhab_basedir = flags.openhabtemplate
         netatmo_run.create_openhab_template(openhab_basedir=opehhab_basedir)
 
+    if flags.webserver:
+        webserver = True
+    else:
+        webserver = False
+
     if flags.daemon:
         logger.info("Launching daemon")
         netatmo_run = MyNetatmo(settings_file=settings_file)
         netatmo_run.get_netatmo_status()
-        netatmo_run.schedule_daemon()
+        netatmo_run.schedule_daemon(webserver=webserver)
        
     return None
 
