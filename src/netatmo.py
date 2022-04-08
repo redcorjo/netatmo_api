@@ -293,7 +293,7 @@ def main():
             netatmo_run = MyNetatmo(settings_file=settings_file)
             response3 = netatmo_run.setthermmode(mode=setthermmode_value)
         else:
-            logger.error(f"Use possible values for sethermmode {value_options}")
+            logger.error(f"Use possible values for sethermmode {valid_options}")
 
     if flags.openhabtemplate:
         logger.info("Create Openhab template")
