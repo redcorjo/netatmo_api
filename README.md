@@ -49,6 +49,10 @@ frequency = frequency_value
 [logging]
 severity = INFO
 filename = netatmo.log
+
+[http]
+host = 0.0.0.0
+port = 8000
 ```
 
 ## Official documentation from Netatmo
@@ -57,4 +61,4 @@ filename = netatmo.log
 <https://dev.netatmo.com/apidocumentation/energy>
 
 
-Version: 2022031501
+Version: 2022040900

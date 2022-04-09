@@ -168,6 +168,44 @@ class Netatmo_API():
         current_status = self.homestatus(home_id=parameters["home_id"])
         return current_status
 
+    def get_xsrf_token(self):
+        if self.token == None:
+            self.get_token()
+        headers = {
+            "accept": "application/json",
+            "Authorization": "Bearer " + self.token
+        }
+        response = requests.get("https://auth.netatmo.com/de-DE/access/login", headers=headers)
+        all_cookies = response.cookies.get_dict()
+        if "XSRF-TOKEN" in all_cookies:
+            XSRF_TOKEN = all_cookies["XSRF-TOKEN"]
+        else:
+            XSRF_TOKEN = ""
+        return XSRF_TOKEN
+
+    def truetemperature(self, room_id: str, corrected_temperature: float, current_temperature: float, home_id: str = None):
+        endpoint = f"{self.endpoint}/api/truetemperature"
+        if self.token == None:
+            self.get_token()
+        headers = {
+            "accept": "application/json",
+            "Authorization": "Bearer " + self.token
+        }
+        XSRF_TOKEN = self.get_xsrf_token()
+        parameters = { "room_id": room_id, "corrected_temperature": corrected_temperature, "current_temperature": current_temperature, "ci_csrf_netatmo": XSRF_TOKEN}
+        if home_id != None:
+            parameters["home_id"] = home_id
+        elif self.home_id != None:
+            parameters["home_id"] = self.home_id
+        else:
+            parameters["home_id"] = self.get_default_home_id()
+        response = requests.get(endpoint, params=parameters, headers=headers)
+        if response.status_code == 200:
+            payload = json.loads(response.content)
+        else:
+            payload = {"status": "failed"}
+        return payload
+
     # # TODO: Pending
     # def getmeasure(self):
     #     endpoint = f"{self.endpoint}/api/getmmeasure"

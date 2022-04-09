@@ -8,6 +8,7 @@ import logging
 import time
 import datetime
 import argparse
+from collections import deque
 from enum import Enum
 from apscheduler.schedulers.background import BackgroundScheduler
 from jinja2 import Template
@@ -34,6 +35,8 @@ class MyNetatmo():
         }
     http_port = 8000
     http_host = "0.0.0.0"
+    mqtt_receive_queue = deque(maxlen=10)
+    mqtt_sent_queue = deque(maxlen=10)
 
     def __init__(self, settings_file: str = None):
         if settings_file == None:
@@ -156,6 +159,7 @@ class MyNetatmo():
             topic = message.topic.split("/")[2]
             value = message.payload.decode()
             logger.info(f"message received {message.payload} value={value} fulltopic={message.topic} qos={message.qos} flag={message.retain} item={item} topic={topic}")
+            self.mqtt_receive_queue.append(message)
             if topic == "therm_mode":
                 self.setthermmode(mode=value)
 
@@ -236,6 +240,11 @@ class MyNetatmo():
     def setthermmode(self, mode="schedule"):
         netatmo = self.get_netatmo_session()
         response = netatmo.setthermmode(mode=mode)
+        return response
+
+    def truetemperature(self, room_id: str, corrected_temperature: float, current_temperature: float, home_id: str = None):
+        netatmo = self.get_netatmo_session()
+        response = netatmo.truetemperature(room_id, corrected_temperature, current_temperature, home_id)
         return response
 
     def create_openhab_template(self, openhab_basedir="/etc/openhab"):
