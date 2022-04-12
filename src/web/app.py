@@ -1,5 +1,6 @@
 from typing import Optional
 from fastapi import FastAPI
+from starlette.responses import RedirectResponse
 from enum import Enum
 import uvicorn
 import logging
@@ -13,6 +14,11 @@ app = FastAPI()
 class SetThermMode(str, Enum):
     schedule = "schedule"
     away = "away"
+
+class MqttMode(str, Enum):
+    inbound = "inbound"
+    outbound = "outbound"
+    both = "both"
 
 @app.put("/setthermode")
 async def put_seththermode(mode: SetThermMode):
@@ -31,9 +37,33 @@ async def put_truetemperature(room_id: str, corrected_temperature: float):
     response = netatmo.truetemperature(room_id, corrected_temperature)
     return response
 
+@app.get("/mqtt")
+async def get_mqtt(mode: Optional[MqttMode] = MqttMode.both): 
+    app_config = app.state.config
+    netatmo = app_config["instance"]
+    config = app_config["config"]
+    if mode == MqttMode.outbound:
+        payload = {
+        "mqtt_receive_queue": [],
+        "mqtt_send_queue": netatmo.mqtt_sent_queue
+        }
+    elif mode == MqttMode.inbound:
+        payload = {
+        "mqtt_receive_queue": netatmo.mqtt_receive_queue,
+        "mqtt_send_queue": []
+        }
+    else:
+        payload = {
+        "mqtt_receive_queue": netatmo.mqtt_receive_queue,
+        "mqtt_send_queue": netatmo.mqtt_sent_queue
+        }
+    return payload
+
 @app.get("/")
-async def read_root():
-    return {"Hello": "World"}
+async def redirect_docs():
+    # return {"Hello": "World"}
+    response = RedirectResponse(url='/docs')
+    return response
 
         # logger.info(f"sethermmode = {setthermmode_value}")
         # valid_options = ["schedule", "away"]

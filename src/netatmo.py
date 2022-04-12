@@ -35,8 +35,8 @@ class MyNetatmo():
         }
     http_port = 8000
     http_host = "0.0.0.0"
-    mqtt_receive_queue = deque(maxlen=10)
-    mqtt_sent_queue = deque(maxlen=10)
+    mqtt_receive_queue = deque(maxlen=30)
+    mqtt_sent_queue = deque(maxlen=30)
 
     def __init__(self, settings_file: str = None):
         if settings_file == None:
@@ -154,6 +154,7 @@ class MyNetatmo():
         self.background_daemon()
 
     def mqtt_on_message(self, client, userdata, message):
+        self.mqtt_receive_queue.appendleft(message)
         if not message.topic.endswith("/state"):
             item = message.topic.split("/")[1]
             topic = message.topic.split("/")[2]
@@ -204,6 +205,8 @@ class MyNetatmo():
                     if "module_ids" in room:
                         del room["module_ids"]
                     all_data["rooms"].append(room)
+                    event = {"payload": room, "item": item}
+                    self.mqtt_sent_queue.appendleft(event)
                     self.mqtt.send_message(payload=room, item=item)
             else:
                 logger.error("Not found any rooms at response")
@@ -224,6 +227,8 @@ class MyNetatmo():
                     if "modules_bridged" in module:
                         del module["modules_bridged"]
                     all_data["modules"].append(module)
+                    event = {"payload": module, "item": item}
+                    self.mqtt_sent_queue.appendleft(event)
                     self.mqtt.send_message(payload=module, item=item)
             else:
                 logger.error("Not found any modules at response")
@@ -233,6 +238,8 @@ class MyNetatmo():
                 del homedata["modules"]
             if "schedules" in homedata:
                 del homedata["schedules"]
+            event = {"payload": homedata, "item": my_home_id}
+            self.mqtt_sent_queue.appendleft(event)
             self.mqtt.send_message(payload=homedata, item=my_home_id)
             all_homes.append(homedata)
         all_data["homes"] = all_homes
