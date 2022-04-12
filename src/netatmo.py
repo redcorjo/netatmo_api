@@ -162,6 +162,8 @@ class MyNetatmo():
             self.mqtt_receive_queue.append(message)
             if topic == "therm_mode":
                 self.setthermmode(mode=value)
+            if topic == "truetemperature":
+                self.truetemperature(item, float(value))
 
     def scheduler_status(self):
         return self.scheduler.running
@@ -238,11 +240,13 @@ class MyNetatmo():
         return all_data
 
     def setthermmode(self, mode="schedule"):
+        logger.info(f"Triggered setthermmode mode={mode}")
         netatmo = self.get_netatmo_session()
         response = netatmo.setthermmode(mode=mode)
         return response
 
     def truetemperature(self, room_id: str, corrected_temperature: float, home_id: str = None):
+        logger.info(f"Triggered truetemperature room_id={room_id} corrected_temperature={corrected_temperature}")
         netatmo = self.get_netatmo_session()
         response = netatmo.set_truetemperature(room_id, corrected_temperature, home_id)
         return response
