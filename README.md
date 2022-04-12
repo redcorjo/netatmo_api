@@ -55,10 +55,20 @@ host = 0.0.0.0
 port = 8000
 ```
 
+## Adjust truetemperature by external mqtt
+
+Let's say we got configure topic as netatmo2mqtt and also that our room_id to adjust true temperature is 1234567890.  If we publish message with the new temperature, it will be sync with netatmo therm_measured_temperature value. 
+
+This source can be generated from openhab, node-red, or any other home automation source
+
+```shell
+mosquitto_pub -t "netatmo2mqtt/1234567890/truetemperature/command" -m 21
+```
+
 ## Official documentation from Netatmo
 
 <https://dev.netatmo.com/apidocumentation/oauth>
 <https://dev.netatmo.com/apidocumentation/energy>
 
 
-Version: 2022040900
+Version: 2022041300
