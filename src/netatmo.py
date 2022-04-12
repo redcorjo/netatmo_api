@@ -163,7 +163,10 @@ class MyNetatmo():
             if topic == "therm_mode":
                 self.setthermmode(mode=value)
             if topic == "truetemperature":
-                self.truetemperature(item, float(value))
+                try:
+                    self.truetemperature(item, float(value))
+                except Exception as e:
+                    logger.error("Exception " + str(e))
 
     def scheduler_status(self):
         return self.scheduler.running
