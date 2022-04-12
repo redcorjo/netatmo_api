@@ -271,7 +271,7 @@ class Netatmo_API():
         #req4 = session.post("https://app.netatmo.net/api/truetemperature",  json=payload, headers=headers)
         req4 = session.post(f"{self.endpoint}/api/truetemperature",  json=payload, headers=headers)
         payload_response = json.loads(req4.text)
-        logger.info(f"Done {req4.status_code}")
+        logger.info(f"Done status={req4.status_code} payload={payload_response}")
         return payload_response
 
     # # TODO: Pending

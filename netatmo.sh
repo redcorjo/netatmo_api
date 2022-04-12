@@ -13,7 +13,7 @@ else
     . .venv/bin/activate
 fi
 
-( cd src ; ../.venv/bin/python3 netatmo.py --daemon )
+( cd src ; ../.venv/bin/python3 netatmo.py --daemon --webserver)
 
 cd ${MYDIR}
 
