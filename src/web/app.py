@@ -24,11 +24,11 @@ async def put_seththermode(mode: SetThermMode):
     return response
 
 @app.put("/truetemperature/{room_id}")
-async def put_truetemperature(room_id: str, corrected_temperature: float, current_temperature: float):
+async def put_truetemperature(room_id: str, corrected_temperature: float):
     app_config = app.state.config
     netatmo = app_config["instance"]
     config = app_config["config"]
-    response = netatmo.truetemperature(room_id, corrected_temperature, current_temperature)
+    response = netatmo.truetemperature(room_id, corrected_temperature)
     return response
 
 @app.get("/")

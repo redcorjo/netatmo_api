@@ -242,9 +242,9 @@ class MyNetatmo():
         response = netatmo.setthermmode(mode=mode)
         return response
 
-    def truetemperature(self, room_id: str, corrected_temperature: float, current_temperature: float, home_id: str = None):
+    def truetemperature(self, room_id: str, corrected_temperature: float, home_id: str = None):
         netatmo = self.get_netatmo_session()
-        response = netatmo.truetemperature(room_id, corrected_temperature, current_temperature, home_id)
+        response = netatmo.set_truetemperature(room_id, corrected_temperature, home_id)
         return response
 
     def create_openhab_template(self, openhab_basedir="/etc/openhab"):

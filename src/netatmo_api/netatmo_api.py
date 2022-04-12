@@ -1,10 +1,12 @@
 #!/bin/python3
+from urllib import response
 import requests
 import json
 import sys
 import os
 import configparser
 import logging
+from lxml import html
 
 # logging.basicConfig(format='%(levelname)-8s [%(filename)s:%(lineno)d] - %(message)s',
 #     datefmt='%Y-%m-%d:%H:%M:%S',
@@ -17,6 +19,7 @@ class Netatmo_API():
     endpoint = "https://api.netatmo.com"
     home_id = None
     token = None
+    session = None
     scopes = "read_station read_thermostat write_thermostat read_camera write_camera access_camera read_presence access_presence read_smokedetector read_homecoach"
 
     def __init__(self, client_id, client_secret, username, password, home_id: str = None, endpoint: str ="https://api.netatmo.com", scopes: str =None):
@@ -183,28 +186,93 @@ class Netatmo_API():
             XSRF_TOKEN = ""
         return XSRF_TOKEN
 
-    def truetemperature(self, room_id: str, corrected_temperature: float, current_temperature: float, home_id: str = None):
-        endpoint = f"{self.endpoint}/api/truetemperature"
-        if self.token == None:
-            self.get_token()
+    def login_page(self, username=None, password=None):
+        if username == None:
+            username = self.username
+        if password == None:
+            password = self.password
+        if self.session == None:
+            self.session = requests.Session()
+        req = self.session.get("https://auth.netatmo.com/en-us/access/login")
+        if req.status_code != 200:
+            logger.error("Unable to contact https://auth.netatmo.com/en-us/access/login")
+            logger.critical("Error: {0}".format(req.status_code))
+            sys.exit(-1)
+        else:
+            logger.info("Successfully got session cookie from https://auth.netatmo.com/en-us/access/login")
+
+        """
+        check if we got a valid session cookie
+        """
+        loginpage = html.fromstring(req.text)
+        token = loginpage.xpath('//input[@name="_token"]/@value')
+
+        if token is None:
+            logger.critical("No _token value found in response from https://auth.netatmo.com/en-us/access/login")
+            sys.exit(-1)
+        else:
+            logger.info("Found _token value {0} in response from https://auth.netatmo.com/en-us/access/login".format(token))
+
+        """
+        build the payload for authentication
+        """
+        payload = {'email': username,
+                    'password': password,
+                    '_token': token } 
+
+        param = { 'next_url' : 'https://my.netatmo.com/app/energy' }
+
+        """
+        login and grab an access token
+        """
+        req2 = self.session.post("https://auth.netatmo.com/access/postlogin", params=param, data=payload)
+
+        cookies = req2.cookies
+
+        session_cookies = self.session.cookies.get_dict()
+        if "netatmocomaccess_token" in session_cookies:
+            access_token = session_cookies["netatmocomaccess_token"].replace("%7C","|")
+            authentication_value = f"Bearer {access_token}"
+        else:
+            raise Exception("Error with access token")
+
         headers = {
-            "accept": "application/json",
-            "Authorization": "Bearer " + self.token
+            "Accept": "application/json",
+            "Content-Type": "application/json",
+            "Authorization": authentication_value
         }
-        XSRF_TOKEN = self.get_xsrf_token()
-        parameters = { "room_id": room_id, "corrected_temperature": corrected_temperature, "current_temperature": current_temperature, "ci_csrf_netatmo": XSRF_TOKEN}
-        if home_id != None:
-            parameters["home_id"] = home_id
-        elif self.home_id != None:
-            parameters["home_id"] = self.home_id
-        else:
-            parameters["home_id"] = self.get_default_home_id()
-        response = requests.get(endpoint, params=parameters, headers=headers)
-        if response.status_code == 200:
-            payload = json.loads(response.content)
-        else:
-            payload = {"status": "failed"}
-        return payload
+        return headers
+
+    def set_truetemperature(self, room_id, corrected_temperature, username=None, password=None, home_id=None):
+        if username == None:
+            username = self.username
+        if password == None:
+            password = self.password
+        if home_id == None:
+            home_id = self.get_default_home_id()
+
+        session = requests.Session()
+
+        headers = self.login_page()
+
+        payload={"home_id": home_id}
+        req3 = session.get(f"{self.endpoint}/api/homestatus", headers=headers, params=payload)
+
+        home_data = json.loads(req3.text)
+        home = home_data["body"]["home"]
+        rooms = home["rooms"]
+        current_temperature = corrected_temperature
+        for room in rooms:
+            if room["id"] == room_id:
+                current_temperature = room["therm_measured_temperature"]
+                break
+        # netatmocomaccess_token
+        payload={"home_id": home_id,"room_id": room_id,"current_temperature":current_temperature,"corrected_temperature":corrected_temperature}
+        #req4 = session.post("https://app.netatmo.net/api/truetemperature",  json=payload, headers=headers)
+        req4 = session.post(f"{self.endpoint}/api/truetemperature",  json=payload, headers=headers)
+        payload_response = json.loads(req4.text)
+        logger.info(f"Done {req4.status_code}")
+        return payload_response
 
     # # TODO: Pending
     # def getmeasure(self):
@@ -266,3 +334,4 @@ class Netatmo_API():
         else:
             payload = {"status": "failed"}
         return payload
+

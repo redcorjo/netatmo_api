@@ -4,3 +4,4 @@ apscheduler
 jinja2
 fastapi
 uvicorn[standard]
+lxml
