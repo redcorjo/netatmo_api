@@ -5,7 +5,6 @@ from enum import Enum
 import uvicorn
 import logging
 
-
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 

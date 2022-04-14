@@ -8,6 +8,7 @@ import logging
 import time
 import datetime
 import argparse
+import datetime
 from collections import deque
 from enum import Enum
 from apscheduler.schedulers.background import BackgroundScheduler
@@ -154,13 +155,19 @@ class MyNetatmo():
         self.background_daemon()
 
     def mqtt_on_message(self, client, userdata, message):
-        self.mqtt_receive_queue.appendleft(message)
         if not message.topic.endswith("/state"):
             item = message.topic.split("/")[1]
             topic = message.topic.split("/")[2]
             value = message.payload.decode()
+            timestamp = time.time()
             logger.info(f"message received {message.payload} value={value} fulltopic={message.topic} qos={message.qos} flag={message.retain} item={item} topic={topic}")
-            self.mqtt_receive_queue.append(message)
+            payload = {
+                "topic": topic,
+                "item": item,
+                "payload": value,
+                "timestamp": timestamp
+            }
+            self.mqtt_receive_queue.appendleft(payload)
             if topic == "therm_mode":
                 self.setthermmode(mode=value)
             if topic == "truetemperature":
@@ -205,7 +212,8 @@ class MyNetatmo():
                     if "module_ids" in room:
                         del room["module_ids"]
                     all_data["rooms"].append(room)
-                    event = {"payload": room, "item": item}
+                    timestamp = time.time()
+                    event = {"topic": "room", "item": item, "payload": room, "timestamp": timestamp}
                     self.mqtt_sent_queue.appendleft(event)
                     self.mqtt.send_message(payload=room, item=item)
             else:
@@ -227,7 +235,8 @@ class MyNetatmo():
                     if "modules_bridged" in module:
                         del module["modules_bridged"]
                     all_data["modules"].append(module)
-                    event = {"payload": module, "item": item}
+                    timestamp = time.time()
+                    event = {"topic": "modules", "item": item, "payload": module, "timestamp": timestamp}
                     self.mqtt_sent_queue.appendleft(event)
                     self.mqtt.send_message(payload=module, item=item)
             else:
@@ -238,7 +247,8 @@ class MyNetatmo():
                 del homedata["modules"]
             if "schedules" in homedata:
                 del homedata["schedules"]
-            event = {"payload": homedata, "item": my_home_id}
+            timestamp = time.time()
+            event = event = {"topic": "homedata", "item": my_home_id, "payload": homedata, "timestamp": timestamp}
             self.mqtt_sent_queue.appendleft(event)
             self.mqtt.send_message(payload=homedata, item=my_home_id)
             all_homes.append(homedata)

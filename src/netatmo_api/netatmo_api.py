@@ -211,7 +211,7 @@ class Netatmo_API():
             logger.critical("No _token value found in response from https://auth.netatmo.com/en-us/access/login")
             sys.exit(-1)
         else:
-            logger.info("Found _token value {0} in response from https://auth.netatmo.com/en-us/access/login".format(token))
+            logger.debug("Found _token value {0} in response from https://auth.netatmo.com/en-us/access/login".format(token))
 
         """
         build the payload for authentication
