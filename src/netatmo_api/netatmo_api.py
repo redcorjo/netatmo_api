@@ -42,7 +42,10 @@ class Netatmo_API():
     def get_token(self):
         # https://dev.netatmo.com/apidocumentation/oauth
         token = None
-        headers = {'Content-Type': 'application/x-www-form-urlencoded'}
+        headers = {
+            "User-Agent": "netatmo-home", 
+            'Content-Type': 'application/x-www-form-urlencoded'
+            }
         request_body={
             "grant_type": "password",
             "client_id": self.client_id,
@@ -74,6 +77,7 @@ class Netatmo_API():
         if self.token == None:
             self.get_token()
         headers = {
+            "User-Agent": "netatmo-home",
             "accept": "application/json",
             "Authorization": "Bearer " + self.token
         }
@@ -99,6 +103,7 @@ class Netatmo_API():
         if self.token == None:
             self.get_token()
         headers = {
+            "User-Agent": "netatmo-home",
             "accept": "application/json",
             "Authorization": "Bearer " + self.token
         }
@@ -160,6 +165,7 @@ class Netatmo_API():
         if self.token == None:
             self.get_token()
         headers = {
+            "User-Agent": "netatmo-home",
             "accept": "application/json",
             "Authorization": "Bearer " + self.token
         }
@@ -175,6 +181,7 @@ class Netatmo_API():
         if self.token == None:
             self.get_token()
         headers = {
+            "User-Agent": "netatmo-home",
             "accept": "application/json",
             "Authorization": "Bearer " + self.token
         }
@@ -193,7 +200,10 @@ class Netatmo_API():
             password = self.password
         if self.session == None:
             self.session = requests.Session()
-        req = self.session.get("https://auth.netatmo.com/en-us/access/login")
+        headers = {
+            "User-Agent": "netatmo-home"
+            }
+        req = self.session.get("https://auth.netatmo.com/en-us/access/login", headers=headers)
         if req.status_code != 200:
             logger.error("Unable to contact https://auth.netatmo.com/en-us/access/login")
             logger.critical("Error: {0}".format(req.status_code))
@@ -225,7 +235,7 @@ class Netatmo_API():
         """
         login and grab an access token
         """
-        req2 = self.session.post("https://auth.netatmo.com/access/postlogin", params=param, data=payload)
+        req2 = self.session.post("https://auth.netatmo.com/access/postlogin", params=param, data=payload, headers=headers)
 
         cookies = req2.cookies
 
@@ -237,6 +247,7 @@ class Netatmo_API():
             raise Exception("Error with access token")
 
         headers = {
+            "User-Agent": "netatmo-home",
             "Accept": "application/json",
             "Content-Type": "application/json",
             "Authorization": authentication_value
@@ -325,6 +336,7 @@ class Netatmo_API():
         if self.token == None:
             self.get_token()
         headers = {
+            "User-Agent": "netatmo-home",
             "accept": "application/json",
             "Authorization": "Bearer " + self.token
         }
