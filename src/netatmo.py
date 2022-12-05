@@ -20,8 +20,20 @@ from web import launch_fastapp
 # logging.basicConfig(format='%(levelname)-8s [%(filename)s:%(lineno)d] - %(message)s',
 #     datefmt='%Y-%m-%d:%H:%M:%S',
 #     level=logging.INFO)
+#logger = logging.getLogger(__name__)
+#logger.setLevel(logging.INFO)
+#logger.propagate = False
+
+logging.basicConfig(level=logging.INFO)
+
+ENVIRONMENT = os.environ.get("ENVIRONMENT", "prod").lower()
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
+stream_handler = logging.StreamHandler()
+logging_formatter = logging.Formatter(
+    '%(levelname)-8s [%(filename)s:%(lineno)d] (' + ENVIRONMENT + ') - %(message)s')
+stream_handler.setFormatter(logging_formatter)
+logger.addHandler(stream_handler)
 #logger.propagate = False
 
 class MyNetatmo():
@@ -64,6 +76,8 @@ class MyNetatmo():
         self.client_secret = config["credentials"]["client_secret"]
         self.username = config["credentials"]["username"]
         self.password = config["credentials"]["password"]
+        self.access_token = config["credentials"]["access_token"]
+        self.refresh_token = config["credentials"]["refresh_token"]
         try:
             self.scopes = config["credentials"]["scopes"]
         except:
@@ -111,6 +125,8 @@ class MyNetatmo():
             config["credentials"]["client_secret"] = "your_client_secret"
             config["credentials"]["username"] = "your_username"
             config["credentials"]["password"] = "your_password"
+            config["credentials"]["access_token"] = "your_access_token"
+            config["credentials"]["refresh_token"] = "your_refresh_token"
             config["credentials"]["scopes"] = "read_station read_thermostat write_thermostat read_camera write_camera access_camera read_presence access_presence read_smokedetector read_homecoach"
             config["home"] = {}
             config["home"]["home_id"] = "your_home_id"
@@ -182,7 +198,7 @@ class MyNetatmo():
     def get_netatmo_session(self):
         config = self.get_settings_file(self.settings_file)
         netatmo = Netatmo_API(self.client_id, self.client_secret,
-                            self.username, self.password, scopes=self.scopes)
+                            self.username, self.password, scopes=self.scopes, access_token=self.access_token)
         return netatmo
 
     def get_netatmo_status(self):

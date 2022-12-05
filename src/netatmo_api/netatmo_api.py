@@ -8,21 +8,27 @@ import configparser
 import logging
 from lxml import html
 
-# logging.basicConfig(format='%(levelname)-8s [%(filename)s:%(lineno)d] - %(message)s',
-#     datefmt='%Y-%m-%d:%H:%M:%S',
-#     level=logging.INFO)
+logging.basicConfig(level=logging.INFO)
+
+ENVIRONMENT = os.environ.get("ENVIRONMENT", "prod").lower()
 logger = logging.getLogger(__name__)
-#logger.propagate = False
+logger.setLevel(logging.INFO)
+stream_handler = logging.StreamHandler()
+logging_formatter = logging.Formatter(
+    '%(levelname)-8s [%(filename)s:%(lineno)d] (' + ENVIRONMENT + ') - %(message)s')
+stream_handler.setFormatter(logging_formatter)
+logger.addHandler(stream_handler)
 
 class Netatmo_API():
 
     endpoint = "https://api.netatmo.com"
     home_id = None
     token = None
+    access_token = None
     session = None
     scopes = "read_station read_thermostat write_thermostat read_camera write_camera access_camera read_presence access_presence read_smokedetector read_homecoach"
 
-    def __init__(self, client_id, client_secret, username, password, home_id: str = None, endpoint: str ="https://api.netatmo.com", scopes: str =None):
+    def __init__(self, client_id, client_secret, username, password, home_id: str = None, endpoint: str ="https://api.netatmo.com", scopes: str =None, access_token: str = None):
         logger.info("Init")
         self.endpoint = endpoint
         self.client_id = client_id
@@ -33,6 +39,8 @@ class Netatmo_API():
             self.home_id = home_id
         if scopes != None:
             self.scopes = scopes
+        if access_token != None:
+            self.access_token = access_token
 
     def get_default_home_id(self):
         payload = self.homesdata()
@@ -44,8 +52,11 @@ class Netatmo_API():
         token = None
         headers = {
             "User-Agent": "netatmo-home", 
-            'Content-Type': 'application/x-www-form-urlencoded'
+            'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'
             }
+        # if self.access_token != None:
+        #     headers["Authorization"] = f"Bearer {self.access_token}"
+            
         request_body={
             "grant_type": "password",
             "client_id": self.client_id,
@@ -183,7 +194,7 @@ class Netatmo_API():
         headers = {
             "User-Agent": "netatmo-home",
             "accept": "application/json",
-            "Authorization": "Bearer " + self.token
+            "Authorization": "Bearer " + self.access_token
         }
         response = requests.get("https://auth.netatmo.com/de-DE/access/login", headers=headers)
         all_cookies = response.cookies.get_dict()

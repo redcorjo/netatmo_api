@@ -4,9 +4,19 @@ from starlette.responses import RedirectResponse
 from enum import Enum
 import uvicorn
 import logging
+import os
 
+logging.basicConfig(level=logging.INFO)
+
+ENVIRONMENT = os.environ.get("ENVIRONMENT", "prod").lower()
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
+stream_handler = logging.StreamHandler()
+logging_formatter = logging.Formatter(
+    '%(levelname)-8s [%(filename)s:%(lineno)d] (' + ENVIRONMENT + ') - %(message)s')
+stream_handler.setFormatter(logging_formatter)
+logger.addHandler(stream_handler)
+#logger.propagate = False
 
 app = FastAPI()
 

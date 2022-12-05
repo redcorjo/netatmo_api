@@ -1,13 +1,19 @@
 import logging
 import json
 import paho.mqtt.client as paho
+import os
 
 
-# logging.basicConfig(format='%(levelname)-8s [%(filename)s:%(lineno)d] - %(message)s',
-#     datefmt='%Y-%m-%d:%H:%M:%S',
-#     level=logging.INFO)
+logging.basicConfig(level=logging.INFO)
+
+ENVIRONMENT = os.environ.get("ENVIRONMENT", "prod").lower()
 logger = logging.getLogger(__name__)
-#logger.propagate = False
+logger.setLevel(logging.INFO)
+stream_handler = logging.StreamHandler()
+logging_formatter = logging.Formatter(
+    '%(levelname)-8s [%(filename)s:%(lineno)d] (' + ENVIRONMENT + ') - %(message)s')
+stream_handler.setFormatter(logging_formatter)
+logger.addHandler(stream_handler)
 
 class MQTT():
 
