@@ -87,6 +87,9 @@ class Netatmo_API():
             parameters["gateways_types"] = gateways_types
         if self.token == None:
             self.get_token()
+        if self.token == None:
+            logger.warning("Error. Not possible to get session token")
+            return None
         headers = {
             "User-Agent": "netatmo-home",
             "accept": "application/json",
@@ -225,6 +228,7 @@ class Netatmo_API():
         """
         check if we got a valid session cookie
         """
+        #req2 = self.session.get("https://auth.netatmo.com/access/postlogin")
         loginpage = html.fromstring(req.text)
         token = loginpage.xpath('//input[@name="_token"]/@value')
 
@@ -275,6 +279,7 @@ class Netatmo_API():
 
         session = requests.Session()
 
+        #headers = {"Authorization": f"Bearer {self.access_token}"}
         headers = self.login_page()
 
         payload={"home_id": home_id}
