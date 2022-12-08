@@ -228,9 +228,11 @@ class Netatmo_API():
         """
         check if we got a valid session cookie
         """
-        #req2 = self.session.get("https://auth.netatmo.com/access/postlogin")
-        loginpage = html.fromstring(req.text)
-        token = loginpage.xpath('//input[@name="_token"]/@value')
+        req2 = self.session.get("https://auth.netatmo.com/access/csrf")
+        token_data = json.loads(req2.text)
+        token = token_data["token"]
+        #loginpage = html.fromstring(req.text)
+        #token = loginpage.xpath('//input[@name="_token"]/@value')
 
         if token is None:
             logger.critical("No _token value found in response from https://auth.netatmo.com/en-us/access/login")
