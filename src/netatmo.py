@@ -50,6 +50,8 @@ class MyNetatmo():
     http_host = "0.0.0.0"
     mqtt_receive_queue = deque(maxlen=30)
     mqtt_sent_queue = deque(maxlen=30)
+    access_token = None
+    refresh_token = None
 
     def __init__(self, settings_file: str = None):
         if settings_file == None:
@@ -76,8 +78,10 @@ class MyNetatmo():
         self.client_secret = config["credentials"]["client_secret"]
         self.username = config["credentials"]["username"]
         self.password = config["credentials"]["password"]
-        self.access_token = config["credentials"]["access_token"]
-        self.refresh_token = config["credentials"]["refresh_token"]
+        if "access_token" in config["credentials"]:
+            self.access_token = config["credentials"]["access_token"]
+        if "refresh_token" in config["credentials"]:
+            self.refresh_token = config["credentials"]["refresh_token"]
         try:
             self.scopes = config["credentials"]["scopes"]
         except:

@@ -7,6 +7,7 @@ import os
 import configparser
 import logging
 from lxml import html
+import pickle
 
 logging.basicConfig(level=logging.INFO)
 
@@ -18,10 +19,12 @@ logging_formatter = logging.Formatter(
     '%(levelname)-8s [%(filename)s:%(lineno)d] (' + ENVIRONMENT + ') - %(message)s')
 stream_handler.setFormatter(logging_formatter)
 logger.addHandler(stream_handler)
+logger.propagate = False
 
 class Netatmo_API():
 
     endpoint = "https://api.netatmo.com"
+    cookies_file = os.path.realpath(os.path.dirname(__file__)) + "/tmp/cookies.tmp"
     home_id = None
     token = None
     access_token = None
@@ -214,23 +217,57 @@ class Netatmo_API():
             password = self.password
         if self.session == None:
             self.session = requests.Session()
+
         headers = {
             "User-Agent": "netatmo-home"
             }
-        req = self.session.get("https://auth.netatmo.com/en-us/access/login", headers=headers)
-        if req.status_code != 200:
-            logger.error("Unable to contact https://auth.netatmo.com/en-us/access/login")
-            logger.critical("Error: {0}".format(req.status_code))
-            sys.exit(-1)
-        else:
-            logger.info("Successfully got session cookie from https://auth.netatmo.com/en-us/access/login")
+             
+        token = None   
+        if os.path.exists(self.cookies_file):
+            with open(self.cookies_file, "rb") as my_file:
+                my_session_cookies = pickle.load(my_file)
+            self.session.cookies = my_session_cookies
+            """
+            check if we got a valid session cookie
+            """
+            req2 = self.session.get("https://auth.netatmo.com/access/csrf")
+            if req2.status_code == 200:
+                token_data = json.loads(req2.text)
+                token = token_data["token"]
+                logger.info("Obtained session token")
+            else:
+                logger.info(f"Removing {self.cookies_file}")
+                os.remove(self.cookies_file)
+        if token == None:
+            logger.info("Required to re-authenticate to obtain new credentials")
+            req = self.session.get("https://auth.netatmo.com/en-us/access/login", headers=headers)
+            if req.status_code != 200:
+                logger.error("Unable to contact https://auth.netatmo.com/en-us/access/login")
+                logger.critical("Error: {0}".format(req.status_code))
+                sys.exit(-1)
+            else:
+                logger.info("Successfully got session cookie from https://auth.netatmo.com/en-us/access/login")
+            my_session_cookies = req.cookies
+            temp_dir = os.path.realpath(os.path.dirname(self.cookies_file)) 
+            if not os.path.exists(temp_dir):
+                logger.info(f"Creating {temp_dir}")
+                os.makedirs(temp_dir)
+            #my_session_serialized_cookies = pickle.dumps(my_session_cookies)
+            with open(self.cookies_file, "wb") as my_file:
+                pickle.dump(my_session_cookies, my_file)
+                logger.info(f"Persisted session cookies at {self.cookies_file}")
+            req2 = self.session.get("https://auth.netatmo.com/access/csrf")
+            if req2.status_code == 200:
+                token_data = json.loads(req2.text)
+                token = token_data["token"]
+            else:
+                logger.warning("Problem obtaining session token")
+                sys.exit(-1)
+            
+        # with open(self.cookies_file, "rb") as my_file:
+        #     my_session_cookies = pickle.load(my_file)
+            
 
-        """
-        check if we got a valid session cookie
-        """
-        req2 = self.session.get("https://auth.netatmo.com/access/csrf")
-        token_data = json.loads(req2.text)
-        token = token_data["token"]
         #loginpage = html.fromstring(req.text)
         #token = loginpage.xpath('//input[@name="_token"]/@value')
 
