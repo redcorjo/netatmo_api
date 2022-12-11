@@ -59,15 +59,31 @@ class Netatmo_API():
             }
         # if self.access_token != None:
         #     headers["Authorization"] = f"Bearer {self.access_token}"
-            
+        #     request_body={
+        #         "grant_type": "password",
+        #         "client_id": self.client_id,
+        #         "client_secret": self.client_secret,
+        #         #"username": self.username,
+        #         #"password": self.password,
+        #         "scope": self.scopes
+        #     }
+        # else:
+        #     request_body={
+        #         "grant_type": "password",
+        #         "client_id": self.client_id,
+        #         "client_secret": self.client_secret,
+        #         "username": self.username,
+        #         "password": self.password,
+        #         "scope": self.scopes
+        #     }
         request_body={
-            "grant_type": "password",
-            "client_id": self.client_id,
-            "client_secret": self.client_secret,
-            "username": self.username,
-            "password": self.password,
-            "scope": self.scopes
-        }
+                "grant_type": "password",
+                "client_id": self.client_id,
+                "client_secret": self.client_secret,
+                "username": self.username,
+                "password": self.password,
+                "scope": self.scopes
+            }
         response = requests.post(self.endpoint + "/oauth2/token", data=request_body, headers=headers)
         if response.status_code == 200:
             payload = json.loads(response.text)
@@ -210,18 +226,10 @@ class Netatmo_API():
             XSRF_TOKEN = ""
         return XSRF_TOKEN
 
-    def login_page(self, username=None, password=None):
-        if username == None:
-            username = self.username
-        if password == None:
-            password = self.password
-        if self.session == None:
-            self.session = requests.Session()
-
+    def get_session_token(self, username=None, password=None):
         headers = {
             "User-Agent": "netatmo-home"
             }
-             
         token = None   
         if os.path.exists(self.cookies_file):
             with open(self.cookies_file, "rb") as my_file:
@@ -244,7 +252,8 @@ class Netatmo_API():
             if req.status_code != 200:
                 logger.error("Unable to contact https://auth.netatmo.com/en-us/access/login")
                 logger.critical("Error: {0}".format(req.status_code))
-                sys.exit(-1)
+                raise Exception("Error: {0}".format(req.status_code))
+                #sys.exit(-1)
             else:
                 logger.info("Successfully got session cookie from https://auth.netatmo.com/en-us/access/login")
             my_session_cookies = req.cookies
@@ -262,20 +271,33 @@ class Netatmo_API():
                 token = token_data["token"]
             else:
                 logger.warning("Problem obtaining session token")
-                sys.exit(-1)
-            
-        # with open(self.cookies_file, "rb") as my_file:
-        #     my_session_cookies = pickle.load(my_file)
-            
+                raise Exception("Problem obtaining session token")
+                # sys.exit(-1)
 
         #loginpage = html.fromstring(req.text)
         #token = loginpage.xpath('//input[@name="_token"]/@value')
 
         if token is None:
             logger.critical("No _token value found in response from https://auth.netatmo.com/en-us/access/login")
-            sys.exit(-1)
+            raise Exception("No _token value found in response from https://auth.netatmo.com/en-us/access/login")
+            #sys.exit(-1)
         else:
             logger.debug("Found _token value {0} in response from https://auth.netatmo.com/en-us/access/login".format(token))
+        return token
+        
+    def login_page(self, username=None, password=None):
+        if username == None:
+            username = self.username
+        if password == None:
+            password = self.password
+        if self.session == None:
+            self.session = requests.Session()
+
+        headers = {
+            "User-Agent": "netatmo-home"
+            }
+             
+        token = self.get_session_token(username=username, password=password)  
 
         """
         build the payload for authentication
