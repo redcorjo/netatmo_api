@@ -343,7 +343,11 @@ class Netatmo_API():
         if home_id == None:
             home_id = self.get_default_home_id()
 
-        session = requests.Session()
+        if self.session == None:
+            session = requests.Session()
+            self.session = session
+        else:
+            session = self.session
 
         #headers = {"Authorization": f"Bearer {self.access_token}"}
         headers = self.login_page()
