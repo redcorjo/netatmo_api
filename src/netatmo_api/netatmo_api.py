@@ -279,6 +279,8 @@ class Netatmo_API():
                 # sys.exit(-1)
             payload = {'email': username,
                     'password': password,
+                    "stay_logged": "on",
+                    #"website": "",
                     '_token': token } 
 
             param = { 'next_url' : 'https://my.netatmo.com/app/energy' }
