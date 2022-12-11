@@ -242,14 +242,20 @@ class Netatmo_API():
             if req1.status_code == 200:
                 token_data = json.loads(req1.text)
                 token = token_data["token"]
-                headers = self.get_access_token_from_cookie(self.session.cookies)
-                req2 = self.session.get("https://app.netatmo.net/api/homesdata", headers=headers)
-                if req2.status_code == 200:
-                    logger.info("Obtained credentials from cache")
-                    successful = True
-                else:
+                try:
+                    headers = self.get_access_token_from_cookie(self.session.cookies)
+                except Exception as e:
+                    logger.warning("Error " + str(e))
                     logger.info(f"Removing {self.cookies_file}")
                     os.remove(self.cookies_file)
+                if os.path.exists(self.cookies_file):
+                    req2 = self.session.get("https://app.netatmo.net/api/homesdata", headers=headers)
+                    if req2.status_code == 200:
+                        logger.info("Obtained credentials from cache")
+                        successful = True
+                    else:
+                        logger.info(f"Removing {self.cookies_file}")
+                        os.remove(self.cookies_file)
             else:
                 logger.info(f"Removing {self.cookies_file}")
                 os.remove(self.cookies_file)
