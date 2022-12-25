@@ -90,7 +90,7 @@ class Netatmo_API():
             token = payload["access_token"]
             self.token = token
         else:
-            logger.error(f"Remote api returned error code {{response.status_code}} . {{response.text}} ")
+            logger.error(f"Remote api returned error code {response.status_code} . {response.text} ")
             token = None
         return token
 
@@ -440,4 +440,3 @@ class Netatmo_API():
         else:
             payload = {"status": "failed"}
         return payload
-
