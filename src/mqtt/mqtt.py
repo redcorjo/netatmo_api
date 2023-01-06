@@ -72,3 +72,4 @@ class MQTT():
         client = paho.Client("mqtt_netatmo")
         client.connect(self.broker, self.port)
         self.client = client
+        

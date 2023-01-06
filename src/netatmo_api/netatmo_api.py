@@ -440,4 +440,3 @@ class Netatmo_API():
         else:
             payload = {"status": "failed"}
         return payload
-
