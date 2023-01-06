@@ -55,13 +55,13 @@ class MQTT():
             logger.info(f"message qos={message.qos}")
             logger.info(f"message retain flag={message.retain}")
 
-    def subscribe_topic(self, topic=None, qos=0, on_message=None):
+    def subscribe_topic(self, topic=None, qos=1, on_message=None):
         if self.client == None:
             self.__connect_queue()
         if topic == None:
             topic = f"{self.topic}/+/update" 
         logger.info(f"Subscribing to mqtt topic {topic}")
-        self.client.subscribe(topic, qos=0)
+        self.client.subscribe(topic, qos=qos)
         if on_message == None:
             self.client.on_message=self.mqtt_on_message
         else:
@@ -72,3 +72,4 @@ class MQTT():
         client = paho.Client("mqtt_netatmo")
         client.connect(self.broker, self.port)
         self.client = client
+        
