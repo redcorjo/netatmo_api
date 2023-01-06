@@ -90,7 +90,7 @@ class Netatmo_API():
             token = payload["access_token"]
             self.token = token
         else:
-            logger.error(f"Remote api returned error code {{response.status_code}} . {{response.text}} ")
+            logger.error(f"Remote api returned error code {response.status_code} . {response.text} ")
             token = None
         return token
 
@@ -279,6 +279,8 @@ class Netatmo_API():
                 # sys.exit(-1)
             payload = {'email': username,
                     'password': password,
+                    "stay_logged": "on",
+                    #"website": "",
                     '_token': token } 
 
             param = { 'next_url' : 'https://my.netatmo.com/app/energy' }
