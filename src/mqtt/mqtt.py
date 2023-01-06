@@ -2,6 +2,7 @@ import logging
 import json
 import paho.mqtt.client as paho
 import os
+import time
 
 
 logging.basicConfig(level=logging.INFO)
@@ -50,7 +51,8 @@ class MQTT():
 
     def mqtt_on_message(self, client, userdata, message):
         if not message.topic.endswith("/state"):
-            logger.info(f"message received {message.payload}")
+            epoch = str(time.time())
+            logger.info(f"message received {message.payload} - epoch={epoch} ")
             logger.info(f"message topic={message.topic}")
             logger.info(f"message qos={message.qos}")
             logger.info(f"message retain flag={message.retain}")
@@ -69,7 +71,8 @@ class MQTT():
         self.client.loop_forever()
 
     def __connect_queue(self):
-        client = paho.Client("mqtt_netatmo")
+        paho_client = "mqtt_netatmo_" + str(time.time())
+        client = paho.Client(paho_client)
         client.connect(self.broker, self.port)
         self.client = client
         
