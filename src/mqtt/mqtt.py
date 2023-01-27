@@ -57,6 +57,14 @@ class MQTT():
             logger.info(f"message qos={message.qos}")
             logger.info(f"message retain flag={message.retain}")
 
+    def on_disconnect(self, client, userdata, rc):
+        if rc != 0:
+            logger.warning("Unexpected MQTT disconnection. Attempting to reconnect.")
+            try:
+                self.client.reconnect()
+            except Exception as e:
+                logger.error(f"Error trying to reconnect to mqtt. Exception " + str(e))
+
     def subscribe_topic(self, topic=None, qos=1, on_message=None):
         if self.client == None:
             self.__connect_queue()
@@ -68,6 +76,7 @@ class MQTT():
             self.client.on_message=self.mqtt_on_message
         else:
             self.client.on_message=on_message
+        self.on_disconnect=self.on_disconnect
         self.client.loop_forever()
 
     def __connect_queue(self):
