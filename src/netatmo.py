@@ -207,6 +207,7 @@ class MyNetatmo():
 
     def get_netatmo_status(self):
         logger.info("Launching get_netatmo_status")
+        # self.mqtt.send_message(payload="test", item="test", topic="test", mode="command")
         netatmo = self.get_netatmo_session()
         homesdata_response = netatmo.homesdata()
         all_data = { 

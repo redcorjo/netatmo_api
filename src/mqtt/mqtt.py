@@ -33,7 +33,7 @@ class MQTT():
             self.topic = topic
         pass
 
-    def send_message(self, payload, topic=None, item=None):
+    def send_message(self, payload, topic=None, item=None, mode="state"):
         if self.client == None:
             self.__connect_queue()
         if topic == None:
@@ -43,9 +43,9 @@ class MQTT():
         else:
             message = json.dumps(payload)
         if item != None:
-            topic = f"{topic}/{item}/state"
+            topic = f"{topic}/{item}/{mode}"
         else:
-            topic = f"{topic}/state"
+            topic = f"{topic}/{mode}"
         self.client.publish(topic, message)
         pass
 

@@ -18,7 +18,24 @@ stream_handler.setFormatter(logging_formatter)
 logger.addHandler(stream_handler)
 #logger.propagate = False
 
-app = FastAPI()
+# Netatmo documentaion https://dev.netatmo.com/apidocumentation/energy 
+
+fastapi_parameters = {
+    "title": "mqtt_netatmo",
+    "description": "Broker APIs to interact with native Netatmo APIs and mqtt endpoints",
+    "version": "0.2.0",
+    "contact": {
+        "name": "Jordi Redondo",
+        "email": "jordipromotions@gmail.com",
+        "url": "https://github.com/redcorjo/netatmo_api"
+    },
+    "license_info": {
+        "name": "GNU GPLv3",
+        "url": "https://github.com/redcorjo/netatmo_api"
+    }
+}
+
+app = FastAPI(**fastapi_parameters)
 
 class SetThermMode(str, Enum):
     schedule = "schedule"
