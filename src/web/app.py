@@ -31,7 +31,7 @@ fastapi_parameters = {
     },
     "license_info": {
         "name": "GNU GPLv3",
-        "url": "https://github.com/redcorjo/netatmo_api"
+        "url": "https://raw.githubusercontent.com/redcorjo/netatmo_api/master/LICENSE.md"
     }
 }
 
