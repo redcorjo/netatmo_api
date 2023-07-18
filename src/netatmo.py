@@ -82,6 +82,8 @@ class MyNetatmo():
             self.access_token = config["credentials"]["access_token"]
         if "refresh_token" in config["credentials"]:
             self.refresh_token = config["credentials"]["refresh_token"]
+        if "redirect_uri" in config["credentials"]:
+            self.redirect_uri = config["credentials"]["redirect_uri"]
         try:
             self.scopes = config["credentials"]["scopes"]
         except:
@@ -131,6 +133,7 @@ class MyNetatmo():
             config["credentials"]["password"] = "your_password"
             config["credentials"]["access_token"] = "your_access_token"
             config["credentials"]["refresh_token"] = "your_refresh_token"
+            config["credentials"]["redirect_uri"] = "your redirect uri"
             config["credentials"]["scopes"] = "read_station read_thermostat write_thermostat read_camera write_camera access_camera read_presence access_presence read_smokedetector read_homecoach"
             config["home"] = {}
             config["home"]["home_id"] = "your_home_id"
@@ -202,7 +205,7 @@ class MyNetatmo():
     def get_netatmo_session(self):
         config = self.get_settings_file(self.settings_file)
         netatmo = Netatmo_API(self.client_id, self.client_secret,
-                            self.username, self.password, scopes=self.scopes, access_token=self.access_token)
+                            self.username, self.password, scopes=self.scopes, access_token=self.access_token, redirect_uri=self.redirect_uri, refresh_token=self.refresh_token)
         return netatmo
 
     def get_netatmo_status(self):
@@ -216,63 +219,66 @@ class MyNetatmo():
             "modules": []
         }
         all_homes = []
-        for homedata in homesdata_response["body"]["homes"]:
-            my_home_id = homedata["id"]
-            if "coordinates" in homedata and "altitude" in homedata:
-                homedata["coordinates"] = "{0},{1},{2}".format(homedata["coordinates"][0],homedata["coordinates"][1], homedata["altitude"] )
-            all_data["homes"].append(homedata)
-            homestatus_response = netatmo.homestatus(home_id=my_home_id)
-            if "rooms" in homestatus_response["body"]["home"]:
-                for room in homestatus_response["body"]["home"]["rooms"]:
-                    item = room["id"]
-                    room["home_id"] = my_home_id
-                    for home_item in all_data["homes"]:
-                        for room_item in home_item["rooms"]:
-                            if room["id"] == room_item["id"]:
-                                room = {**room , **room_item}
-                    if "module_ids" in room:
-                        del room["module_ids"]
-                    all_data["rooms"].append(room)
-                    timestamp = time.time()
-                    event = {"topic": "room", "item": item, "payload": room, "timestamp": timestamp}
-                    self.mqtt_sent_queue.appendleft(event)
-                    self.mqtt.send_message(payload=room, item=item)
-            else:
-                logger.error("Not found any rooms at response")
-            if "modules" in homestatus_response["body"]["home"]:
-                for module in homestatus_response["body"]["home"]["modules"]:
-                    item = module["id"]
-                    module["home_id"] = my_home_id
-                    for home_item in all_data["homes"]:
-                        for module_item in home_item["modules"]:
-                            if module["id"] == module_item["id"]:
-                                module = {**module, **module_item}
-                                module["label"] = module["id"].replace(":", "")
-                    if "setup_date" in module:
-                        # "yyyy-MM-dd'T'HH:mm:ss.SSSZ"
-                        my_formatted_time = time.strftime("%Y-%m-%dT%H:%M:%S.000Z", time.localtime(module["setup_date"]))
-                        #my_fomratted_time = datetime.datetime.fromtimestamp(module["setup_date"]).strftime('yyyy-MM-dd'T'HH:mm:ssZ')
-                        module["setup_date"] = my_formatted_time
-                    if "modules_bridged" in module:
-                        del module["modules_bridged"]
-                    all_data["modules"].append(module)
-                    timestamp = time.time()
-                    event = {"topic": "modules", "item": item, "payload": module, "timestamp": timestamp}
-                    self.mqtt_sent_queue.appendleft(event)
-                    self.mqtt.send_message(payload=module, item=item)
-            else:
-                logger.error("Not found any modules at response")
-            if "rooms" in homedata:
-                del homedata["rooms"]
-            if "modules" in homedata:
-                del homedata["modules"]
-            if "schedules" in homedata:
-                del homedata["schedules"]
-            timestamp = time.time()
-            event = event = {"topic": "homedata", "item": my_home_id, "payload": homedata, "timestamp": timestamp}
-            self.mqtt_sent_queue.appendleft(event)
-            self.mqtt.send_message(payload=homedata, item=my_home_id)
-            all_homes.append(homedata)
+        if homesdata_response != None and "body" in homesdata_response and "homes" in homesdata_response["body"]:
+            for homedata in homesdata_response["body"]["homes"]:
+                my_home_id = homedata["id"]
+                if "coordinates" in homedata and "altitude" in homedata:
+                    homedata["coordinates"] = "{0},{1},{2}".format(homedata["coordinates"][0],homedata["coordinates"][1], homedata["altitude"] )
+                all_data["homes"].append(homedata)
+                homestatus_response = netatmo.homestatus(home_id=my_home_id)
+                if "rooms" in homestatus_response["body"]["home"]:
+                    for room in homestatus_response["body"]["home"]["rooms"]:
+                        item = room["id"]
+                        room["home_id"] = my_home_id
+                        for home_item in all_data["homes"]:
+                            for room_item in home_item["rooms"]:
+                                if room["id"] == room_item["id"]:
+                                    room = {**room , **room_item}
+                        if "module_ids" in room:
+                            del room["module_ids"]
+                        all_data["rooms"].append(room)
+                        timestamp = time.time()
+                        event = {"topic": "room", "item": item, "payload": room, "timestamp": timestamp}
+                        self.mqtt_sent_queue.appendleft(event)
+                        self.mqtt.send_message(payload=room, item=item)
+                else:
+                    logger.error("Not found any rooms at response")
+                if "modules" in homestatus_response["body"]["home"]:
+                    for module in homestatus_response["body"]["home"]["modules"]:
+                        item = module["id"]
+                        module["home_id"] = my_home_id
+                        for home_item in all_data["homes"]:
+                            for module_item in home_item["modules"]:
+                                if module["id"] == module_item["id"]:
+                                    module = {**module, **module_item}
+                                    module["label"] = module["id"].replace(":", "")
+                        if "setup_date" in module:
+                            # "yyyy-MM-dd'T'HH:mm:ss.SSSZ"
+                            my_formatted_time = time.strftime("%Y-%m-%dT%H:%M:%S.000Z", time.localtime(module["setup_date"]))
+                            #my_fomratted_time = datetime.datetime.fromtimestamp(module["setup_date"]).strftime('yyyy-MM-dd'T'HH:mm:ssZ')
+                            module["setup_date"] = my_formatted_time
+                        if "modules_bridged" in module:
+                            del module["modules_bridged"]
+                        all_data["modules"].append(module)
+                        timestamp = time.time()
+                        event = {"topic": "modules", "item": item, "payload": module, "timestamp": timestamp}
+                        self.mqtt_sent_queue.appendleft(event)
+                        self.mqtt.send_message(payload=module, item=item)
+                else:
+                    logger.error("Not found any modules at response")
+                if "rooms" in homedata:
+                    del homedata["rooms"]
+                if "modules" in homedata:
+                    del homedata["modules"]
+                if "schedules" in homedata:
+                    del homedata["schedules"]
+                timestamp = time.time()
+                event = event = {"topic": "homedata", "item": my_home_id, "payload": homedata, "timestamp": timestamp}
+                self.mqtt_sent_queue.appendleft(event)
+                self.mqtt.send_message(payload=homedata, item=my_home_id)
+                all_homes.append(homedata)
+        else:
+            logger.warning("No homesdata_response obtained")
         all_data["homes"] = all_homes
         all_data["broker"] = self.broker
         all_data["port"] = self.port

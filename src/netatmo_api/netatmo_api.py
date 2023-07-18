@@ -29,13 +29,16 @@ class Netatmo_API():
     token = None
     access_token = None
     session = None
+    redirect_uri = None
     scopes = "read_station read_thermostat write_thermostat read_camera write_camera access_camera read_presence access_presence read_smokedetector read_homecoach"
 
-    def __init__(self, client_id, client_secret, username, password, home_id: str = None, endpoint: str ="https://api.netatmo.com", scopes: str =None, access_token: str = None):
+    def __init__(self, client_id, client_secret, username, password, home_id: str = None, endpoint: str ="https://api.netatmo.com", scopes: str =None, access_token: str = None, redirect_uri: str =None, refresh_token: str = None):
         logger.info("Init")
         self.endpoint = endpoint
         self.client_id = client_id
         self.client_secret = client_secret
+        self.redirect_uri = redirect_uri
+        self.refresh_token = refresh_token
         self.username = username
         self.password = password
         if home_id != None:
@@ -77,17 +80,27 @@ class Netatmo_API():
         #         "scope": self.scopes
         #     }
         request_body={
-                "grant_type": "password",
+                "grant_type": "refresh_token",
                 "client_id": self.client_id,
                 "client_secret": self.client_secret,
-                "username": self.username,
-                "password": self.password,
-                "scope": self.scopes
+                #"username": self.username,
+                #"password": self.password,
+                "refresh_token": self.refresh_token
+                #"scope": self.scopes
             }
-        response = requests.post(self.endpoint + "/oauth2/token", data=request_body, headers=headers)
+        url = f"{self.endpoint}/oauth2/token"
+        response = requests.post(url, data=request_body, headers=headers)
         if response.status_code == 200:
-            payload = json.loads(response.text)
-            token = payload["access_token"]
+            try:
+                payload = json.loads(response.text)
+            except Exception as e:
+                logger.warning(f"Exception " + str(e))
+                payload = {}
+            if "access_token" in payload:
+                token = payload["access_token"]
+            else:
+                logger.warning("No token obtained from the auth session")
+                token = None
             self.token = token
         else:
             logger.error(f"Remote api returned error code {response.status_code} . {response.text} ")
