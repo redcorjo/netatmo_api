@@ -33,6 +33,7 @@ client_id = client_id_value
 client_secret = client_secret_value
 username = username_value
 password = password_value
+refresh_token = refresh_token_value
 scopes = read_station read_thermostat write_thermostat read_camera write_camera access_camera read_presence access_presence read_smokedetector read_homecoach
 
 [home]
@@ -71,4 +72,4 @@ mosquitto_pub -t "netatmo2mqtt/1234567890/truetemperature/command" -m 21
 <https://dev.netatmo.com/apidocumentation/energy>
 
 
-Version: 2022041301
+Version: 2023071800
