@@ -112,6 +112,7 @@ class MyNetatmo():
                 self.http_port = int(config["http"]["port"])
             if "host" in config["http"]:
                 self.http_host = int(config["http"]["host"])
+                
 
     def get_settings_file(self, settings_file: str = None):
         if settings_file == None:

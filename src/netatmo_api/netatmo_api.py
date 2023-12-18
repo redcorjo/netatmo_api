@@ -54,58 +54,44 @@ class Netatmo_API():
         return home_id
 
     def get_token(self):
+        login_headers = self.get_session_headers()
         # https://dev.netatmo.com/apidocumentation/oauth
-        token = None
-        headers = {
-            "User-Agent": "netatmo-home", 
-            'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'
-            }
-        # if self.access_token != None:
-        #     headers["Authorization"] = f"Bearer {self.access_token}"
-        #     request_body={
-        #         "grant_type": "password",
+        token = login_headers["Authorization"].split(" ")[1]
+        self.token = token
+        return token
+        # token = None
+        # headers = {
+        #     "User-Agent": "netatmo-home", 
+        #     'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8',
+        #     "Authorization": login_headers["Authorization"]
+        #     }
+        # request_body={
+        #         "grant_type": "refresh_token",
         #         "client_id": self.client_id,
         #         "client_secret": self.client_secret,
         #         #"username": self.username,
         #         #"password": self.password,
-        #         "scope": self.scopes
+        #         "refresh_token": self.refresh_token
+        #         #"scope": self.scopes
         #     }
+        # url = f"{self.endpoint}/oauth2/token"
+        # response = requests.post(url, data=request_body, headers=headers)
+        # if response.status_code == 200:
+        #     try:
+        #         payload = json.loads(response.text)
+        #     except Exception as e:
+        #         logger.warning(f"Exception " + str(e))
+        #         payload = {}
+        #     if "access_token" in payload:
+        #         token = payload["access_token"]
+        #     else:
+        #         logger.warning("No token obtained from the auth session")
+        #         token = None
+        #     self.token = token
         # else:
-        #     request_body={
-        #         "grant_type": "password",
-        #         "client_id": self.client_id,
-        #         "client_secret": self.client_secret,
-        #         "username": self.username,
-        #         "password": self.password,
-        #         "scope": self.scopes
-        #     }
-        request_body={
-                "grant_type": "refresh_token",
-                "client_id": self.client_id,
-                "client_secret": self.client_secret,
-                #"username": self.username,
-                #"password": self.password,
-                "refresh_token": self.refresh_token
-                #"scope": self.scopes
-            }
-        url = f"{self.endpoint}/oauth2/token"
-        response = requests.post(url, data=request_body, headers=headers)
-        if response.status_code == 200:
-            try:
-                payload = json.loads(response.text)
-            except Exception as e:
-                logger.warning(f"Exception " + str(e))
-                payload = {}
-            if "access_token" in payload:
-                token = payload["access_token"]
-            else:
-                logger.warning("No token obtained from the auth session")
-                token = None
-            self.token = token
-        else:
-            logger.error(f"Remote api returned error code {response.status_code} . {response.text} ")
-            token = None
-        return token
+        #     logger.error(f"Remote api returned error code {response.status_code} . {response.text} ")
+        #     token = None
+        # return token
 
     def homesdata(self, home_id: str = None,  gateways_types: list = None):
         endpoint = f"{self.endpoint}/api/homesdata"
@@ -244,6 +230,11 @@ class Netatmo_API():
             "User-Agent": "netatmo-home"
             }
         successful = False   
+        if self.session == None:
+            session = requests.Session()
+            self.session = session
+        else:
+            session = self.session
         if os.path.exists(self.cookies_file):
             with open(self.cookies_file, "rb") as my_file:
                 my_session_cookies = pickle.load(my_file)

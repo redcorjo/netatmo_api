@@ -40,6 +40,7 @@ app = FastAPI(**fastapi_parameters)
 class SetThermMode(str, Enum):
     schedule = "schedule"
     away = "away"
+    hg = "hg"
 
 class MqttMode(str, Enum):
     inbound = "inbound"
