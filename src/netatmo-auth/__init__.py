@@ -1,0 +1,1 @@
+from .netatmoauth import NetatmoAuth

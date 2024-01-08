@@ -59,39 +59,6 @@ class Netatmo_API():
         token = login_headers["Authorization"].split(" ")[1]
         self.token = token
         return token
-        # token = None
-        # headers = {
-        #     "User-Agent": "netatmo-home", 
-        #     'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8',
-        #     "Authorization": login_headers["Authorization"]
-        #     }
-        # request_body={
-        #         "grant_type": "refresh_token",
-        #         "client_id": self.client_id,
-        #         "client_secret": self.client_secret,
-        #         #"username": self.username,
-        #         #"password": self.password,
-        #         "refresh_token": self.refresh_token
-        #         #"scope": self.scopes
-        #     }
-        # url = f"{self.endpoint}/oauth2/token"
-        # response = requests.post(url, data=request_body, headers=headers)
-        # if response.status_code == 200:
-        #     try:
-        #         payload = json.loads(response.text)
-        #     except Exception as e:
-        #         logger.warning(f"Exception " + str(e))
-        #         payload = {}
-        #     if "access_token" in payload:
-        #         token = payload["access_token"]
-        #     else:
-        #         logger.warning("No token obtained from the auth session")
-        #         token = None
-        #     self.token = token
-        # else:
-        #     logger.error(f"Remote api returned error code {response.status_code} . {response.text} ")
-        #     token = None
-        # return token
 
     def homesdata(self, home_id: str = None,  gateways_types: list = None):
         endpoint = f"{self.endpoint}/api/homesdata"
@@ -226,6 +193,10 @@ class Netatmo_API():
         return XSRF_TOKEN
 
     def get_session_headers(self, username=None, password=None):
+        if username == None:
+            username = self.username
+        if password == None:
+            password = self.password
         headers = {
             "User-Agent": "netatmo-home"
             }
@@ -273,6 +244,7 @@ class Netatmo_API():
                 #sys.exit(-1)
             else:
                 logger.info("Successfully got session cookie from https://auth.netatmo.com/en-us/access/login")
+            self.session.cookies.set("netatmocomlast_app_used", "app_thermostat", domain=".netatmo.com")
             req2 = self.session.get("https://auth.netatmo.com/access/csrf")
             if req2.status_code == 200:
                 token_data = json.loads(req2.text)
@@ -284,14 +256,17 @@ class Netatmo_API():
             payload = {'email': username,
                     'password': password,
                     "stay_logged": "on",
-                    #"website": "",
+                    #"website": None,
                     '_token': token } 
 
-            param = { 'next_url' : 'https://my.netatmo.com/app/energy' }
-            req3 = self.session.post("https://auth.netatmo.com/access/postlogin", params=param, data=payload, headers=headers)
+            req3 = self.session.post("https://auth.netatmo.com/access/postlogin", data=payload, headers=headers, allow_redirects=False)
+            cookies = self.session.cookies.get_dict()
+            param = { 'next_url' : 'https://my.netatmo.com' }
+            req4 = self.session.get("https://auth.netatmo.com/access/keychain", params=param, headers=headers, allow_redirects=False)
+            cookies = self.session.cookies.get_dict()
             headers = self.get_access_token_from_cookie(self.session.cookies)
-            req4 = self.session.get("https://app.netatmo.net/api/homesdata", headers=headers)
-            if req4.status_code == 200:
+            req5 = self.session.get("https://app.netatmo.net/api/homesdata", headers=headers)
+            if req5.status_code == 200:
                 logger.info("Successfully obtained credentials")
             else:
                 logger.error("Error obtaining credentials")
@@ -301,29 +276,25 @@ class Netatmo_API():
             if not os.path.exists(temp_dir):
                 logger.info(f"Creating {temp_dir}")
                 os.makedirs(temp_dir)
-            #my_session_serialized_cookies = pickle.dumps(my_session_cookies)
             with open(self.cookies_file, "wb") as my_file:
                 pickle.dump(my_session_cookies, my_file)
                 logger.info(f"Persisted session cookies at {self.cookies_file}")
                 successful = True
-        #loginpage = html.fromstring(req.text)
-        #token = loginpage.xpath('//input[@name="_token"]/@value')
-
         if successful == False:
             logger.critical("No _token value found in response from https://auth.netatmo.com/en-us/access/login")
             raise Exception("No _token value found in response from https://auth.netatmo.com/en-us/access/login")
-            #sys.exit(-1)
         else:
             logger.debug("Found _token value {0} in response from https://auth.netatmo.com/en-us/access/login".format(token))
         return headers
         
     def get_access_token_from_cookie(self, cookies):
         session_cookies = cookies.get_dict()
-        if "netatmocomaccess_token" in session_cookies:
-            access_token = session_cookies["netatmocomaccess_token"].replace("%7C","|")
+        cookie_name = "netatmocomaccess_token"
+        if cookie_name in session_cookies:
+            access_token = session_cookies[cookie_name].replace("%7C","|")
             authentication_value = f"Bearer {access_token}"
         else:
-            raise Exception("Error with access token")
+            raise Exception(f"Error with access token {cookie_name}")
         headers = {
             "User-Agent": "netatmo-home",
             "Accept": "application/json",
@@ -361,7 +332,6 @@ class Netatmo_API():
         else:
             session = self.session
 
-        #headers = {"Authorization": f"Bearer {self.access_token}"}
         headers = self.login_page()
 
         payload={"home_id": home_id}
